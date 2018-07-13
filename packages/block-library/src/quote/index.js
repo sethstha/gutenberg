@@ -7,7 +7,7 @@ import { castArray, get, isString, isEmpty, omit } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
+import { concatChildren, Fragment } from '@wordpress/element';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
 	BlockControls,
@@ -231,6 +231,14 @@ export const settings = {
 				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
+	},
+
+	merge( attributes = {}, attributesToMerge = {} ) {
+		return {
+			...attributes,
+			value: ( attributes.value || [] ).concat( attributesToMerge.value || [] ),
+			citation: concatChildren( attributes.citation, attributesToMerge.citation ),
+		};
 	},
 
 	deprecated: [

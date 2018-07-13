@@ -2,7 +2,7 @@
  * WordPress
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
+import { concatChildren, Fragment } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
@@ -53,7 +53,7 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, className } ) {
+	edit( { attributes, setAttributes, className, mergeBlocks } ) {
 		const { textAlign, content } = attributes;
 
 		return (
@@ -77,6 +77,7 @@ export const settings = {
 					style={ { textAlign: textAlign } }
 					placeholder={ __( 'Write…' ) }
 					wrapperClassName={ className }
+					onMerge={ mergeBlocks }
 				/>
 			</Fragment>
 		);
@@ -93,5 +94,11 @@ export const settings = {
 				value={ content }
 			/>
 		);
+	},
+
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: concatChildren( attributes.content, attributesToMerge.content ),
+		};
 	},
 };
