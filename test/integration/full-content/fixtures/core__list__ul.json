@@ -7,47 +7,242 @@
             "ordered": false,
             "values": [
                 {
-                    "type": "li",
-                    "children": [
-                        "Text & Headings"
-                    ]
+                    "formats": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "text": "Text & Headings"
                 },
                 {
-                    "type": "li",
-                    "children": [
-                        "Images & Videos"
-                    ]
+                    "formats": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "text": "Images & Videos"
                 },
                 {
-                    "type": "li",
-                    "children": [
-                        "Galleries"
-                    ]
+                    "formats": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "text": "Galleries"
                 },
                 {
-                    "type": "li",
-                    "children": [
-                        "Embeds, like YouTube, Tweets, or other WordPress posts."
-                    ]
+                    "formats": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "text": "Embeds, like YouTube, Tweets, or other WordPress posts."
                 },
                 {
-                    "type": "li",
-                    "children": [
-                        "Layout blocks, like Buttons, Hero Images, Separators, etc."
-                    ]
+                    "formats": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "text": "Layout blocks, like Buttons, Hero Images, Separators, etc."
                 },
                 {
-                    "type": "li",
-                    "children": [
-                        "And ",
-                        {
-                            "type": "em",
-                            "children": [
-                                "Lists"
-                            ]
-                        },
-                        " like this one of course :)"
-                    ]
+                    "formats": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        [
+                            {
+                                "type": "em"
+                            }
+                        ],
+                        [
+                            {
+                                "type": "em"
+                            }
+                        ],
+                        [
+                            {
+                                "type": "em"
+                            }
+                        ],
+                        [
+                            {
+                                "type": "em"
+                            }
+                        ],
+                        [
+                            {
+                                "type": "em"
+                            }
+                        ],
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "text": "And Lists like this one of course :)"
                 }
             ]
         },

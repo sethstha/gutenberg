@@ -11,7 +11,17 @@ import apiFetch from '@wordpress/api-fetch';
 export default {
 	name: 'users',
 	className: 'editor-autocompleters__user',
-	triggerPrefix: '@',
+	test( string ) {
+		if ( string.indexOf( '@' ) === -1 ) {
+			return false;
+		}
+
+		return /(?:\s|^)@\w*$/.test( string );
+	},
+	getQuery( string ) {
+		const match = string.match( /@(\w*)$/ );
+		return match && match[ 1 ];
+	},
 	options( search ) {
 		let payload = '';
 		if ( search ) {
@@ -29,9 +39,6 @@ export default {
 			<span key="name" className="editor-autocompleters__user-name">{ user.name }</span>,
 			<span key="slug" className="editor-autocompleters__user-slug">{ user.slug }</span>,
 		];
-	},
-	allowNode() {
-		return true;
 	},
 	getOptionCompletion( user ) {
 		return `@${ user.slug }`;

@@ -58,9 +58,8 @@ function getTableSectionAttributeSchema( section ) {
 				selector: 'td,th',
 				query: {
 					content: {
-						type: 'array',
-						default: [],
-						source: 'children',
+						type: 'object',
+						source: 'rich-text',
 					},
 					tag: {
 						type: 'string',

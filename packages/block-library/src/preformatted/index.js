@@ -18,8 +18,8 @@ export const settings = {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'object',
+			source: 'rich-text',
 			selector: 'pre',
 		},
 	},

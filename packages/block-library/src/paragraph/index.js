@@ -18,7 +18,7 @@ import {
 } from '@wordpress/editor';
 import {
 	getPhrasingContentSchema,
-	children,
+	richTextStructure,
 } from '@wordpress/blocks';
 
 /**
@@ -32,10 +32,9 @@ const supports = {
 
 const schema = {
 	content: {
-		type: 'array',
-		source: 'children',
+		type: 'object',
+		source: 'rich-text',
 		selector: 'p',
-		default: [],
 	},
 	align: {
 		type: 'string',
@@ -201,9 +200,7 @@ export const settings = {
 			migrate( attributes ) {
 				return {
 					...attributes,
-					content: [
-						<RawHTML key="html">{ attributes.content }</RawHTML>,
-					],
+					content: richTextStructure.create( attributes.content ),
 				};
 			},
 		},
@@ -211,10 +208,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat(
-				attributes.content,
-				attributesToMerge.content
-			),
+			content: RichText.concat( attributes.content, attributesToMerge.content ),
 		};
 	},
 

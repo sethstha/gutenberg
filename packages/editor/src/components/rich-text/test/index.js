@@ -11,84 +11,9 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import {
-	RichText,
-	getFormatValue,
-} from '../';
+
+import { RichText } from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
-
-jest.mock( '@wordpress/deprecated', () => jest.fn() );
-
-describe( 'getFormatValue', () => {
-	function createMockNode( nodeName, attributes = {} ) {
-		return {
-			nodeName,
-			hasAttribute( name ) {
-				return !! attributes[ name ];
-			},
-			getAttribute( name ) {
-				return attributes[ name ];
-			},
-		};
-	}
-
-	test( 'basic formatting', () => {
-		expect( getFormatValue( 'bold' ) ).toEqual( {
-			isActive: true,
-		} );
-	} );
-
-	test( 'link formatting when no anchor is found', () => {
-		const formatValue = getFormatValue( 'link', [
-			createMockNode( 'P' ),
-		] );
-		expect( formatValue ).toEqual( {
-			isActive: true,
-		} );
-	} );
-
-	test( 'link formatting', () => {
-		const mockNode = createMockNode( 'A', {
-			href: 'https://www.testing.com',
-			target: '_blank',
-		} );
-
-		const formatValue = getFormatValue( 'link', [ mockNode ] );
-
-		expect( formatValue ).toEqual( {
-			isActive: true,
-			value: 'https://www.testing.com',
-			target: '_blank',
-			node: mockNode,
-		} );
-	} );
-
-	test( 'link formatting when the anchor has no attributes', () => {
-		const mockNode = createMockNode( 'A' );
-
-		const formatValue = getFormatValue( 'link', [ mockNode ] );
-
-		expect( formatValue ).toEqual( {
-			isActive: true,
-			value: '',
-			target: '',
-			node: mockNode,
-		} );
-	} );
-
-	test( 'link formatting when the link is still being added', () => {
-		const formatValue = getFormatValue( 'link', [
-			createMockNode( 'A', {
-				href: '#',
-				'data-wp-placeholder': 'true',
-				'data-mce-bogus': 'true',
-			} ),
-		] );
-		expect( formatValue ).toEqual( {
-			isAdding: true,
-		} );
-	} );
-} );
 
 describe( 'RichText', () => {
 	describe( 'Component', () => {

@@ -192,7 +192,7 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, format, onPaste } = this.props;
+		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, format, onPaste, multiline } = this.props;
 		const ariaProps = pickAriaProps( this.props );
 
 		/*
@@ -217,7 +217,7 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: valueToString( defaultValue, format ) },
+			dangerouslySetInnerHTML: { __html: valueToString( defaultValue, multiline, format ) },
 			onPaste,
 		} );
 	}

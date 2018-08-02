@@ -6,37 +6,70 @@
         "attributes": {
             "value": [
                 {
-                    "children": {
-                        "type": "p",
-                        "props": {
-                            "children": [
-                                "Paragraph ",
-                                {
-                                    "type": "strong",
-                                    "props": {
-                                        "children": [
-                                            "one"
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    }
+                    "formats": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        [
+                            {
+                                "type": "strong"
+                            }
+                        ],
+                        [
+                            {
+                                "type": "strong"
+                            }
+                        ],
+                        [
+                            {
+                                "type": "strong"
+                            }
+                        ]
+                    ],
+                    "text": "Paragraph one"
                 },
                 {
-                    "children": {
-                        "type": "p",
-                        "props": {
-                            "children": [
-                                "Paragraph two"
-                            ]
-                        }
-                    }
+                    "formats": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ],
+                    "text": "Paragraph two"
                 }
             ],
-            "citation": [
-                "by whomever"
-            ]
+            "citation": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "by whomever"
+            }
         },
         "innerBlocks": [],
         "originalContent": "<blockquote class=\"wp-block-pullquote\">\n    <p>Paragraph <strong>one</strong></p>\n    <p>Paragraph two</p>\n    <cite>by whomever</cite>\n</blockquote>"

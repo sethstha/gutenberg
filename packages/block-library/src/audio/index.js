@@ -31,7 +31,7 @@ export const settings = {
 		},
 		caption: {
 			type: 'array',
-			source: 'children',
+			source: 'rich-text',
 			selector: 'figcaption',
 		},
 		id: {

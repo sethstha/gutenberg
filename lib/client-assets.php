@@ -380,6 +380,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-keycodes',
 			'wp-polyfill-ecmascript',
 			'wp-url',
+			'wp-blocks',
 		),
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
 		true

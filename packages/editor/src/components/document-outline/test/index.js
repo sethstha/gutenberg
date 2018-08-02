@@ -50,15 +50,24 @@ describe( 'DocumentOutline', () => {
 
 		paragraph = createBlock( 'core/paragraph' );
 		headingH1 = createBlock( 'core/heading', {
-			content: 'Heading 1',
+			content: {
+				formats: [],
+				text: 'Heading 1',
+			},
 			level: 1,
 		} );
 		headingParent = createBlock( 'core/heading', {
-			content: 'Heading parent',
+			content: {
+				formats: [],
+				text: 'Heading parent',
+			},
 			level: 2,
 		} );
 		headingChild = createBlock( 'core/heading', {
-			content: 'Heading child',
+			content: {
+				formats: [],
+				text: 'Heading child',
+			},
 			level: 3,
 		} );
 

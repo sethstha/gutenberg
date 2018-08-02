@@ -25,6 +25,7 @@ import { createHooks, applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getBlockType, getBlockTypes } from './registration';
+import { create } from './rich-text-structure';
 
 /**
  * Returns a block object given its type and attributes.
@@ -41,12 +42,14 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
-	const attributes = reduce( blockType.attributes, ( result, source, key ) => {
+	const attributes = reduce( blockType.attributes, ( result, schema, key ) => {
 		const value = blockAttributes[ key ];
 		if ( undefined !== value ) {
 			result[ key ] = value;
-		} else if ( source.hasOwnProperty( 'default' ) ) {
-			result[ key ] = source.default;
+		} else if ( schema.source === 'rich-text' ) {
+			result[ key ] = create( null, schema.multiline );
+		} else if ( schema.hasOwnProperty( 'default' ) ) {
+			result[ key ] = schema.default;
 		}
 
 		return result;
