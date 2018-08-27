@@ -19,22 +19,6 @@ jest.mock( '@wordpress/deprecated', () => jest.fn() );
 
 describe( 'RichText', () => {
 	describe( 'Component', () => {
-		describe( '.adaptFormatter', () => {
-			const wrapper = shallow( <RichText value={ [ 'valid' ] } /> );
-			const options = {
-				type: 'inline-style',
-				style: {
-					'font-weight': '600',
-				},
-			};
-
-			test( 'should return an object on inline: span, and a styles property matching the style object provided', () => {
-				expect( wrapper.instance().adaptFormatter( options ) ).toEqual( {
-					inline: 'span',
-					styles: options.style,
-				} );
-			} );
-		} );
 		describe( '.getSettings', () => {
 			const value = richTextStructure.create();
 			const settings = {

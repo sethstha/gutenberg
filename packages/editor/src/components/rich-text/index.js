@@ -5,9 +5,7 @@ import classnames from 'classnames';
 import {
 	defer,
 	find,
-	forEach,
 	identity,
-	isEqual,
 	noop,
 } from 'lodash';
 import 'element-closest';
@@ -187,8 +185,6 @@ export class RichText extends Component {
 	}
 
 	onInit() {
-		// this.registerCustomFormatters();
-
 		this.editor.shortcuts.add( rawShortcut.primary( 'k' ), '', () => this.addFormat( { type: 'a', attributes: { href: '' } } ) );
 		this.editor.shortcuts.add( rawShortcut.access( 'a' ), '', () => this.addFormat( { type: 'a', attributes: { href: '' } } ) );
 		this.editor.shortcuts.add( rawShortcut.access( 's' ), '', () => this.removeFormat( 'a' ) );
@@ -200,23 +196,6 @@ export class RichText extends Component {
 		// Remove TinyMCE Core shortcut for consistency with global editor
 		// shortcuts. Also clashes with Mac browsers.
 		this.editor.shortcuts.remove( 'meta+y', '', 'Redo' );
-	}
-
-	adaptFormatter( options ) {
-		switch ( options.type ) {
-			case 'inline-style': {
-				return {
-					inline: 'span',
-					styles: { ...options.style },
-				};
-			}
-		}
-	}
-
-	registerCustomFormatters() {
-		forEach( this.props.formatters, ( formatter ) => {
-			this.editor.formatter.register( formatter.format, this.adaptFormatter( formatter ) );
-		} );
 	}
 
 	/**
@@ -239,24 +218,52 @@ export class RichText extends Component {
 		}
 	}
 
+	/**
+	 * Get the current record (value and selection) from props and state.
+	 *
+	 * @return {Object} The current record (value and selection).
+	 */
 	getRecord() {
-		const { value } = this.props;
-		const { selection } = this.state;
-		return { value, selection };
+		return {
+			value: this.props.value,
+			selection: this.state.selection,
+		};
 	}
 
+	/**
+	 * Apply a format with the current value and selection.
+	 *
+	 * @param {Object} format The format to apply.
+	 */
 	applyFormat( format ) {
 		this.onChange( richTextStructure.applyFormat( this.getRecord(), format ) );
 	}
 
+	/**
+	 * Remove a format from the current value with the current selection.
+	 *
+	 * @param {string} formatType The type of format to remove.
+	 */
 	removeFormat( formatType ) {
 		this.onChange( richTextStructure.removeFormat( this.getRecord(), formatType ) );
 	}
 
+	/**
+	 * Get the current format based on the selection
+	 *
+	 * @param {string} formatType The type of format to check.
+	 *
+	 * @return {boolean} Wether the format is active or not.
+	 */
 	getActiveFormat( formatType ) {
 		return richTextStructure.getActiveFormat( this.getRecord(), formatType );
 	}
 
+	/**
+	 * Toggle a format based on the selection.
+	 *
+	 * @param {Object} format The format to toggle.
+	 */
 	toggleFormat( format ) {
 		if ( this.getActiveFormat( format.type ) ) {
 			this.removeFormat( format.type );
@@ -406,7 +413,7 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles the input event and transformations on the new content.
+	 * Handles the `input` event: sync the content and handle transformations.
 	 */
 	onInput() {
 		const { multiline } = this.props;
@@ -424,40 +431,24 @@ export class RichText extends Component {
 		this.props.onChange( record.value );
 	}
 
-	onChange( record ) {
-		const { multiline } = this.props;
-		const rootNode = this.editor.getBody();
-
-		if ( ! record ) {
-			const range = this.editor.selection.getRng();
-			record = richTextStructure.createWithSelection( rootNode, range, multiline, richTextStructureSettings );
-		} else {
-			richTextStructure.apply( record, rootNode, multiline );
-		}
-
-		this.savedContent = record.value;
-		this.props.onChange( record.value );
-	}
-
+	/**
+	 * Handles the `selectionchange` event: sync the selection to local state.
+	 */
 	onSelectionChange() {
 		const rootNode = this.editor.getBody();
 
+		// Ensure it's the active element. This is a global event.
 		if ( document.activeElement !== rootNode ) {
 			return;
 		}
 
 		const range = this.editor.selection.getRng();
-
-		// Ignore selection movement to paste bin.
-		if ( range.startContainer.parentNode.id === 'mcepastebin' ) {
-			return;
-		}
-
 		const { multiline } = this.props;
 		const { selection } = richTextStructure.createWithSelection( rootNode, range, multiline, richTextStructureSettings );
 		const { start: nextStart, end: nextEnd } = selection;
 		const { start, end } = this.state.selection;
 
+		// Only set state if it's actually different.
 		if ( multiline ) {
 			if (
 				start !== nextStart ||
@@ -472,6 +463,34 @@ export class RichText extends Component {
 		} else if ( start !== nextStart || end !== nextEnd ) {
 			this.setState( { selection } );
 		}
+	}
+
+	/**
+	 * Sync the value to global state.
+	 *
+	 * - If a record is provided, that record's value will be synced, the node
+	 *   tree will be updated with the value, and the provided record's
+	 *   selection will be set.
+	 * - If no record is provided (such as after an input event), the node
+	 *   tree will be converted to the right structure and synced. In the
+	 *   future, the node tree and selection may be updated if they are
+	 *   different after conversion.
+	 *
+	 * @param {Object} record The record to sync and apply. Optional.
+	 */
+	onChange( record ) {
+		const { multiline } = this.props;
+		const rootNode = this.editor.getBody();
+
+		if ( ! record ) {
+			const range = this.editor.selection.getRng();
+			record = richTextStructure.createWithSelection( rootNode, range, multiline, richTextStructureSettings );
+		} else {
+			richTextStructure.apply( record, rootNode, multiline );
+		}
+
+		this.savedContent = record.value;
+		this.props.onChange( record.value );
 	}
 
 	onCreateUndoLevel( event ) {
@@ -803,13 +822,6 @@ export class RichText extends Component {
 			}, this.editor.getBody(), multiline );
 		}
 
-		if ( 'development' === process.env.NODE_ENV ) {
-			if ( ! isEqual( this.props.formatters, prevProps.formatters ) ) {
-				// eslint-disable-next-line no-console
-				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
-			}
-		}
-
 		// When the block is unselected, remove placeholder links and hide the formatting toolbar.
 		if ( ! this.props.isSelected && prevProps.isSelected ) {
 			this.setState( { formats: {} } );
@@ -829,7 +841,6 @@ export class RichText extends Component {
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
 			isSelected,
-			formatters,
 			autocompleters,
 			format,
 		} = this.props;
@@ -850,7 +861,6 @@ export class RichText extends Component {
 				getActiveFormat={ this.getActiveFormat }
 				toggleFormat={ this.toggleFormat }
 				enabledControls={ formattingControls }
-				customControls={ formatters }
 			/>
 		);
 
@@ -922,7 +932,6 @@ export class RichText extends Component {
 
 RichText.defaultProps = {
 	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
-	formatters: [],
 	format: 'children',
 };
 
