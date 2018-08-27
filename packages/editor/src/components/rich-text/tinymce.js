@@ -10,12 +10,12 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { richTextStructure } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { diffAriaProps, pickAriaProps } from './aria';
-import { valueToString } from './format';
 
 /**
  * Determines whether we need a fix to provide `input` events for contenteditable.
@@ -159,9 +159,6 @@ export default class TinyMCE extends Component {
 			convert_urls: false,
 			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
 			plugins: [],
-			formats: {
-				strikethrough: { inline: 'del' },
-			},
 		} );
 
 		tinymce.init( {
@@ -192,7 +189,7 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, format, onPaste, multiline } = this.props;
+		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, onPaste, multiline } = this.props;
 		const ariaProps = pickAriaProps( this.props );
 
 		/*
@@ -217,7 +214,7 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: valueToString( defaultValue, multiline, format ) },
+			dangerouslySetInnerHTML: { __html: richTextStructure.toString( defaultValue, multiline ) },
 			onPaste,
 		} );
 	}

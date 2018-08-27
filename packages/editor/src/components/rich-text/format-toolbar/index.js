@@ -21,7 +21,7 @@ const FormatToolbar = ( props ) => {
 		},
 	} );
 
-	const toolbarControls = FORMATTING_CONTROLS.concat( props.customControls )
+	const toolbarControls = FORMATTING_CONTROLS
 		.filter( ( control ) => props.enabledControls.indexOf( control.format ) !== -1 )
 		.map( ( control ) => {
 			if ( control.format === 'link' ) {

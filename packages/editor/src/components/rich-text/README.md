@@ -4,12 +4,6 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 ## Properties
 
-### `format: String`
-
-*Optional.* Format of the RichText provided value prop. It can be `children` or `string`.
-
-*Default: `children`*.
-
 ### `value: Array|String`
 
 *Required.* Depending on the format prop, this value could be an array of React DOM to make editable or an HTML string. The rendered HTML should be valid, and valid with respect to the `tagName` and `inline` property.
