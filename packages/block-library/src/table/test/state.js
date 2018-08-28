@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * WordPress dependencies
  */
-import { richTextStructure } from '@wordpress/blocks';
+import { create } from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
@@ -25,11 +25,11 @@ const table = deepFreeze( {
 		{
 			cells: [
 				{
-					content: richTextStructure.create(),
+					content: create(),
 					tag: 'td',
 				},
 				{
-					content: richTextStructure.create(),
+					content: create(),
 					tag: 'td',
 				},
 			],
@@ -37,11 +37,11 @@ const table = deepFreeze( {
 		{
 			cells: [
 				{
-					content: richTextStructure.create(),
+					content: create(),
 					tag: 'td',
 				},
 				{
-					content: richTextStructure.create(),
+					content: create(),
 					tag: 'td',
 				},
 			],
@@ -54,11 +54,11 @@ const tableWithContent = deepFreeze( {
 		{
 			cells: [
 				{
-					content: richTextStructure.create(),
+					content: create(),
 					tag: 'td',
 				},
 				{
-					content: richTextStructure.create(),
+					content: create(),
 					tag: 'td',
 				},
 			],
@@ -66,11 +66,11 @@ const tableWithContent = deepFreeze( {
 		{
 			cells: [
 				{
-					content: richTextStructure.create(),
+					content: create(),
 					tag: 'td',
 				},
 				{
-					content: richTextStructure.create( 'test' ),
+					content: create( 'test' ),
 					tag: 'td',
 				},
 			],
@@ -92,7 +92,7 @@ describe( 'updateCellContent', () => {
 			section: 'body',
 			rowIndex: 1,
 			columnIndex: 1,
-			content: richTextStructure.create( 'test' ),
+			content: create( 'test' ),
 		} );
 
 		expect( state ).toEqual( tableWithContent );
@@ -111,23 +111,11 @@ describe( 'insertRow', () => {
 				{
 					cells: [
 						{
-							content: richTextStructure.create(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: richTextStructure.create(),
-							tag: 'td',
-						},
-					],
-				},
-				{
-					cells: [
-						{
-							content: richTextStructure.create(),
-							tag: 'td',
-						},
-						{
-							content: richTextStructure.create( 'test' ),
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -135,11 +123,23 @@ describe( 'insertRow', () => {
 				{
 					cells: [
 						{
-							content: richTextStructure.create(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: richTextStructure.create(),
+							content: create( 'test' ),
+							tag: 'td',
+						},
+					],
+				},
+				{
+					cells: [
+						{
+							content: create(),
+							tag: 'td',
+						},
+						{
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -163,15 +163,15 @@ describe( 'insertColumn', () => {
 				{
 					cells: [
 						{
-							content: richTextStructure.create(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: richTextStructure.create(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: richTextStructure.create(),
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -179,15 +179,15 @@ describe( 'insertColumn', () => {
 				{
 					cells: [
 						{
-							content: richTextStructure.create(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: richTextStructure.create( 'test' ),
+							content: create( 'test' ),
 							tag: 'td',
 						},
 						{
-							content: richTextStructure.create(),
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -211,11 +211,11 @@ describe( 'deleteRow', () => {
 				{
 					cells: [
 						{
-							content: richTextStructure.create(),
+							content: create(),
 							tag: 'td',
 						},
 						{
-							content: richTextStructure.create( 'test' ),
+							content: create( 'test' ),
 							tag: 'td',
 						},
 					],
@@ -239,7 +239,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: richTextStructure.create(),
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -247,7 +247,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: richTextStructure.create( 'test' ),
+							content: create( 'test' ),
 							tag: 'td',
 						},
 					],
@@ -264,7 +264,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: richTextStructure.create(),
+							content: create(),
 							tag: 'td',
 						},
 					],
@@ -272,7 +272,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: richTextStructure.create( 'test' ),
+							content: create( 'test' ),
 							tag: 'td',
 						},
 					],

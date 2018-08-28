@@ -16,7 +16,7 @@ import {
 	split,
 	getActiveFormat,
 	getTextContent,
-} from '../rich-text-structure';
+} from '../';
 
 function createNode( HTML ) {
 	const doc = document.implementation.createHTMLDocument( '' );

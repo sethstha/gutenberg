@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
 import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { richTextStructure } from '@wordpress/blocks';
+import { getTextContent, splice, isCollapsed } from '@wordpress/rich-text-structure';
 import { getRectangleFromRange } from '@wordpress/dom';
 
 /**
@@ -142,7 +142,7 @@ function getCaretRect() {
 }
 
 function getTextBeforeSelection( record ) {
-	const text = richTextStructure.getTextContent( record );
+	const text = getTextContent( record );
 	let start = record.selection.start;
 
 	if ( Array.isArray( start ) ) {
@@ -186,7 +186,7 @@ export class Autocomplete extends Component {
 
 		replacement = replacement.slice( 1 + this.state.query.length );
 
-		const newRecord = richTextStructure.splice( record, undefined, 0, replacement );
+		const newRecord = splice( record, undefined, 0, replacement );
 
 		onChange( newRecord );
 	}
@@ -387,7 +387,7 @@ export class Autocomplete extends Component {
 			this.toggleKeyEvents( ! ! this.state.open );
 		}
 
-		if ( richTextStructure.isCollapsed( record ) ) {
+		if ( isCollapsed( record ) ) {
 			const text = getTextBeforeSelection( record );
 			const prevText = getTextBeforeSelection( prevRecord );
 

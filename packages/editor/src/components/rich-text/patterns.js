@@ -6,11 +6,11 @@ import { filter, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getBlockTransforms, findTransform, richTextStructure } from '@wordpress/blocks';
+import { getBlockTransforms, findTransform } from '@wordpress/blocks';
+import { splice, applyFormat, getTextContent } from '@wordpress/rich-text-structure';
 
 export default function() {
 	const { onReplace, multiline } = this.props;
-	const { splice, applyFormat, getTextContent } = richTextStructure;
 
 	const {
 		// enter: enterPatterns,

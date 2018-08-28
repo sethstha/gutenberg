@@ -7,7 +7,7 @@ import { shallow } from 'enzyme';
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { richTextStructure } from '@wordpress/blocks';
+import { create } from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
@@ -20,7 +20,7 @@ jest.mock( '@wordpress/deprecated', () => jest.fn() );
 describe( 'RichText', () => {
 	describe( 'Component', () => {
 		describe( '.getSettings', () => {
-			const value = richTextStructure.create();
+			const value = create();
 			const settings = {
 				setting: 'hi',
 			};

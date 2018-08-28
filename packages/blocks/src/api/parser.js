@@ -10,6 +10,7 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
+import { create } from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
@@ -19,7 +20,6 @@ import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 import { getCommentDelimitedContent } from './serializer';
 import { attr, html, text, query, node, children, prop } from './matchers';
-import { create } from './rich-text-structure';
 
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true

@@ -16,10 +16,8 @@ import {
 	getFontSizeClass,
 	RichText,
 } from '@wordpress/editor';
-import {
-	getPhrasingContentSchema,
-	richTextStructure,
-} from '@wordpress/blocks';
+import { getPhrasingContentSchema } from '@wordpress/blocks';
+import { create } from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
@@ -200,7 +198,7 @@ export const settings = {
 			migrate( attributes ) {
 				return {
 					...attributes,
-					content: richTextStructure.create( attributes.content ),
+					content: create( attributes.content ),
 				};
 			},
 		},

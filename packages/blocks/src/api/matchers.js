@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { create } from './rich-text-structure';
+import { create } from '@wordpress/rich-text-structure';
 
 /**
  * External dependencies

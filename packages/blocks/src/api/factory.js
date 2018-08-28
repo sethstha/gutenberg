@@ -20,12 +20,12 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import { create } from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
  */
 import { getBlockType, getBlockTypes } from './registration';
-import { create } from './rich-text-structure';
 
 /**
  * Returns a block object given its type and attributes.

@@ -10,7 +10,7 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { richTextStructure } from '@wordpress/blocks';
+import { toString } from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
@@ -214,7 +214,7 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: richTextStructure.toString( defaultValue, multiline ) },
+			dangerouslySetInnerHTML: { __html: toString( defaultValue, multiline ) },
 			onPaste,
 		} );
 	}

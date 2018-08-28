@@ -1,3 +1,7 @@
+/**
+ * External dependencies
+ */
+
 import { find } from 'lodash';
 
 /**
@@ -6,6 +10,13 @@ import { find } from 'lodash';
 
 const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
+/**
+ * Parse the given HTML into a body element.
+ *
+ * @param {string} html The HTML to parse.
+ *
+ * @return {HTMLBodyElement} Body element with parsed HTML.
+ */
 function createElement( html ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 
@@ -14,6 +25,16 @@ function createElement( html ) {
 	return doc.body;
 }
 
+/**
+ * Creates rich text value and selection objects from a DOM element and range.
+ *
+ * @param {HTMLElement} element   Element to create value object from.
+ * @param {Range}       range     Range to create selection object from.
+ * @param {string}      multiline Multiline tag if the structure is multiline.
+ * @param {Object}      settings  Settings passed to `createRecord`.
+ *
+ * @return {Object} A rich text record.
+ */
 export function createWithSelection( element, range, multiline, settings ) {
 	if ( typeof element === 'string' ) {
 		element = createElement( element );
@@ -58,11 +79,39 @@ export function createWithSelection( element, range, multiline, settings ) {
 	} );
 }
 
+/**
+ * Creates a rich text value object from a DOM element.
+ *
+ * @param {HTMLElement} element   Element to create value object from.
+ * @param {string}      multiline Multiline tag.
+ * @param {Object}      settings  Settings passed to `createRecord`.
+ *
+ * @return {Object} A rich text value object.
+ */
 export function create( element, multiline, settings ) {
 	return createWithSelection( element, null, multiline, settings ).value;
 }
 
-function createRecord( element, range, settings = {} ) {
+/**
+ * Creates rich text value and selection objects from a DOM element and range.
+ *
+ * @param {HTMLElement} element                 Element to create value object
+ *                                              from.
+ * @param {Range}       range                   Range to create selection object
+ *                                              from.
+ * @param {Object}    $3                      Settings.
+ * @param {Function}    $3.removeNodeMatch      Function to declare whether the
+ *                                              given node should be removed.
+ * @param {Function}    $3.unwrapNodeMatch      Function to declare whether the
+ *                                              given node should be unwrapped.
+ * @param {Function}    $3.filterString         Function to filter the given
+ *                                              string.
+ * @param {Function}    $3.removeAttributeMatch Wether to remove an attribute
+ *                                              based on the name.
+ *
+ * @return {Object} A rich text record.
+ */
+function createRecord( element, range, $3 = {} ) {
 	if ( ! element ) {
 		return {
 			value: {
@@ -77,7 +126,8 @@ function createRecord( element, range, settings = {} ) {
 		removeNodeMatch = () => false,
 		unwrapNodeMatch = () => false,
 		filterString = ( string ) => string,
-	} = settings;
+		removeAttributeMatch,
+	} = $3;
 
 	const filterStringComplete = ( string ) => filterString( string.replace( '\n', '' ) );
 
@@ -147,12 +197,12 @@ function createRecord( element, range, settings = {} ) {
 
 			if ( ! unwrapNodeMatch( node ) && node.nodeName !== 'BR' ) {
 				const type = node.nodeName.toLowerCase();
-				const attributes = getAttributes( node, settings );
+				const attributes = getAttributes( node, { removeAttributeMatch } );
 
 				format = attributes ? { type, attributes } : { type };
 			}
 
-			const { value, selection } = createRecord( node, range, settings );
+			const { value, selection } = createRecord( node, range, $3 );
 			const text = value.text;
 			const start = accumulator.value.text.length;
 
@@ -213,6 +263,16 @@ function createRecord( element, range, settings = {} ) {
 	} );
 }
 
+/**
+ * Applies the given element tree and selection to the live DOM (very basic diff
+ * for now).
+ *
+ * @param {Object}      value     Object with the element tree and selection
+ *                                paths to apply.
+ * @param {HTMLElement} current   The live root node to apply the element tree
+ *                                to.
+ * @param {string}     multiline Multiline tag.
+ */
 export function apply( value, current, multiline ) {
 	const { body: future, selection } = toDOM( value, multiline );
 	let i = 0;
@@ -279,14 +339,22 @@ export function apply( value, current, multiline ) {
 	sel.addRange( range );
 }
 
-function getAttributes( element, settings = {} ) {
+/**
+ * Gets the attributes of an element in object shape.
+ *
+ * @param {HTMLElement} element                 Element to get attributes from.
+ * @param {Function}    $2.removeAttributeMatch Wether to remove an attribute
+ *                                              based on the name.
+ *
+ * @return {?Object} Attribute object or `undefined` if the element has no
+ *                   attributes.
+ */
+function getAttributes( element, {
+	removeAttributeMatch = () => false,
+} ) {
 	if ( ! element.hasAttributes() ) {
 		return;
 	}
-
-	const {
-		removeAttributeMatch = () => false,
-	} = settings;
 
 	return Array.from( element.attributes ).reduce( ( acc, { name, value } ) => {
 		if ( ! removeAttributeMatch( name ) ) {
@@ -298,6 +366,16 @@ function getAttributes( element, settings = {} ) {
 	}, undefined );
 }
 
+/**
+ * Creates a path as an array of indices from the given root node to the given
+ * node.
+ *
+ * @param {Node}        node     Node to find the path of.
+ * @param {HTMLElement} rootNode Root node to find the path from.
+ * @param {Array}       path     Initial path to build on.
+ *
+ * @return {Array} The path from the root node to the node.
+ */
 function createPathToNode( node, rootNode, path ) {
 	const parentNode = node.parentNode;
 	let i = 0;
@@ -315,6 +393,14 @@ function createPathToNode( node, rootNode, path ) {
 	return path;
 }
 
+/**
+ * Gets a node given a path (array of indices) from the given node.
+ *
+ * @param {HTMLElement} node Root node to find the wanted node in.
+ * @param {Array}       path Path (indices) to the wanted node.
+ *
+ * @return {Object} Object with the found node and the remaining offset if any.
+ */
 function getNodeByPath( node, path ) {
 	path = [ ...path ];
 
@@ -328,6 +414,15 @@ function getNodeByPath( node, path ) {
 	};
 }
 
+/**
+ * Creates an element tree and selection paths from a rich text record.
+ *
+ * @param {Object}  record    The record to create from.
+ * @param {string}  multiline Multiline tag.
+ * @param {?string} _tag      Internal use only.
+ *
+ * @return {Object} Object with the element tree and selection paths.
+ */
 export function toDOM( { value, selection = {} }, multiline, _tag ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 	let { body } = doc;
@@ -449,6 +544,14 @@ export function toDOM( { value, selection = {} }, multiline, _tag ) {
 	};
 }
 
+/**
+ * Creates an HTML string from a rich text record.
+ *
+ * @param {Object} record    Rich text record.
+ * @param {string} multiline Multiline tag.
+ *
+ * @return {string} HTML string.
+ */
 export function toString( record, multiline ) {
 	return toDOM( { value: record }, multiline ).body.innerHTML;
 }
