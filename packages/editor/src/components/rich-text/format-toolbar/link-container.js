@@ -24,23 +24,45 @@ import { filterURLForDisplay } from '../../../utils/url';
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 class LinkContainer extends Component {
-	constructor() {
+	constructor( { link, selection } ) {
 		super( ...arguments );
-		this.state = {};
 
 		this.editLink = this.editLink.bind( this );
 		this.submitLink = this.submitLink.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onChangeLinkValue = this.onChangeLinkValue.bind( this );
+		this.onChangeInputValue = this.onChangeInputValue.bind( this );
 		this.toggleLinkSettingsVisibility = this.toggleLinkSettingsVisibility.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
+
+		this.state = {
+			inputValue: link && link.attributes && link.attributes.href ? null : '',
+			opensInNewWindow: null,
+			lastSelection: selection,
+			selectionKey: 0,
+		};
+	}
+
+	static getDerivedStateFromProps( { link, selection }, state ) {
+		if ( selection === state.lastSelection ) {
+			return null;
+		}
+
+		return {
+			inputValue: link.attributes && link.attributes.href ? null : '',
+			opensInNewWindow: null,
+			lastSelection: selection,
+			selectionKey: state.selectionKey + 1,
+		};
 	}
 
 	onKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
 			event.stopPropagation();
-			this.setState( { linkValue: '' } );
 			this.props.removeFormat( 'a' );
+			this.setState( {
+				inputValue: null,
+				opensInNewWindow: null,
+			} );
 		}
 
 		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
@@ -49,8 +71,8 @@ class LinkContainer extends Component {
 		}
 	}
 
-	onChangeLinkValue( value ) {
-		this.setState( { linkValue: value } );
+	onChangeInputValue( inputValue ) {
+		this.setState( { inputValue } );
 	}
 
 	toggleLinkSettingsVisibility() {
@@ -58,37 +80,39 @@ class LinkContainer extends Component {
 	}
 
 	setLinkTarget( opensInNewWindow ) {
-		this.setState( { opensInNewWindow } );
-		if ( this.props.formats.link && ! this.props.formats.link.isAdding ) {
-			this.props.onChange( { link: {
-				value: this.props.formats.link.value,
-				target: opensInNewWindow ? '_blank' : null,
-				rel: opensInNewWindow ? 'noreferrer noopener' : null,
-			} } );
+		// Apply now if URL is not being edited.
+		if ( this.state.opensInNewWindow === null ) {
+			const { link } = this.props;
+
+			if ( opensInNewWindow ) {
+				link.attributes.target = '_blank';
+				link.attributes.rel = 'noreferrer noopener';
+			} else {
+				delete link.attributes.target;
+				delete link.attributes.rel;
+			}
+
+			this.props.applyFormat( link );
+		} else {
+			this.setState( { opensInNewWindow } );
 		}
-
-		this.props.applyFormat( format );
-
-		const format = this.props.getActiveFormat( 'a' );
-
-		if ( opensInNewWindow ) {
-			format.attributes.target = '_blank';
-			format.attributes.rel = 'noreferrer noopener';
-		}
-
-		this.props.applyFormat( format );
 	}
 
 	editLink( event ) {
-		const format = this.props.getActiveFormat( 'a' );
+		const { link } = this.props;
 
-		this.setState( { linkValue: format.attributes.href, isEditing: true } );
+		this.setState( {
+			inputValue: link.attributes.href,
+			opensInNewWindow: link.attributes.target === '_blank',
+		} );
+
 		event.preventDefault();
 	}
 
 	submitLink( event ) {
-		const { linkValue, opensInNewWindow } = this.state;
-		const href = prependHTTP( linkValue );
+		const { link } = this.props;
+		const { inputValue, opensInNewWindow } = this.state;
+		const href = prependHTTP( inputValue );
 		const format = {
 			type: 'a',
 			attributes: {
@@ -103,42 +127,46 @@ class LinkContainer extends Component {
 
 		this.props.applyFormat( format );
 
-		this.setState( { linkValue: href } );
+		this.setState( {
+			inputValue: null,
+			opensInNewWindow: null,
+		} );
 
-		// if ( ! this.props.formats.link.value ) {
-		// 	this.props.speak( __( 'Link added.' ), 'assertive' );
-		// }
+		if ( ! link ) {
+			this.props.speak( __( 'Link added.' ), 'assertive' );
+		}
 
 		event.preventDefault();
 	}
 
 	render() {
 		const { link } = this.props;
-		const { linkValue, settingsVisible, opensInNewWindow, isEditing } = this.state;
+		const { inputValue, settingsVisible, opensInNewWindow, selectionKey } = this.state;
 
 		if ( ! link ) {
 			return null;
 		}
 
-		const isEditingLink = isEditing || ( link && ( ! link.attributes || ! link.attributes.href ) );
 		const linkSettings = settingsVisible && (
 			<div className="editor-format-toolbar__link-modal-line editor-format-toolbar__link-settings">
 				<ToggleControl
 					label={ __( 'Open in New Window' ) }
-					checked={ opensInNewWindow }
+					checked={ opensInNewWindow === null ? link.attributes.target === '_blank' : opensInNewWindow }
 					onChange={ this.setLinkTarget } />
 			</div>
 		);
 
 		return (
 			<Fill name="RichText.Siblings">
-				<PositionedAtSelection className="editor-format-toolbar__link-container">
+				<PositionedAtSelection
+					className="editor-format-toolbar__link-container"
+					key={ selectionKey /* Used to force rerender on selection change */ }
+				>
 					<Popover
 						position="bottom center"
-						focusOnMount={ isEditing ? 'firstElement' : false }
-						key={ 1 /* Used to force rerender on change */ }
+						focusOnMount={ inputValue === null ? false : 'firstElement' }
 					>
-						{ isEditingLink && (
+						{ inputValue !== null && (
 							// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 							<form
@@ -147,7 +175,7 @@ class LinkContainer extends Component {
 								onKeyDown={ this.onKeyDown }
 								onSubmit={ this.submitLink }>
 								<div className="editor-format-toolbar__link-modal-line">
-									<URLInput value={ linkValue } onChange={ this.onChangeLinkValue } />
+									<URLInput value={ inputValue } onChange={ this.onChangeInputValue } />
 									<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 									<IconButton
 										className="editor-format-toolbar__link-settings-toggle"
@@ -162,7 +190,7 @@ class LinkContainer extends Component {
 							/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 						) }
 
-						{ ! isEditingLink && (
+						{ inputValue === null && (
 							// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-static-element-interactions */
 							<div

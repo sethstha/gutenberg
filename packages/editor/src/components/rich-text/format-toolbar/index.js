@@ -44,13 +44,14 @@ const FormatToolbar = ( props ) => {
 	return (
 		<ToolbarContainer>
 			<Toolbar controls={ toolbarControls } />
-			<LinkContainer
+			{ link && <LinkContainer
 				link={ link }
+				selection={ props.selection }
 				applyFormat={ props.applyFormat }
 				removeFormat={ props.removeFormat }
 				getActiveFormat={ props.getActiveFormat }
 				toggleFormat={ props.toggleFormat }
-			/>
+			/> }
 		</ToolbarContainer>
 	);
 };

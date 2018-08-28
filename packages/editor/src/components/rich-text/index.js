@@ -185,8 +185,8 @@ export class RichText extends Component {
 	}
 
 	onInit() {
-		this.editor.shortcuts.add( rawShortcut.primary( 'k' ), '', () => this.addFormat( { type: 'a', attributes: { href: '' } } ) );
-		this.editor.shortcuts.add( rawShortcut.access( 'a' ), '', () => this.addFormat( { type: 'a', attributes: { href: '' } } ) );
+		this.editor.shortcuts.add( rawShortcut.primary( 'k' ), '', () => this.applyFormat( { type: 'a', attributes: { href: '' } } ) );
+		this.editor.shortcuts.add( rawShortcut.access( 'a' ), '', () => this.applyFormat( { type: 'a', attributes: { href: '' } } ) );
 		this.editor.shortcuts.add( rawShortcut.access( 's' ), '', () => this.removeFormat( 'a' ) );
 		this.editor.shortcuts.add( rawShortcut.access( 'd' ), '', () => this.toggleFormat( { type: 'del' } ) );
 		this.editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => this.toggleFormat( { type: 'code' } ) );
@@ -850,6 +850,7 @@ export class RichText extends Component {
 
 		const formatToolbar = (
 			<FormatToolbar
+				selection={ this.state.selection }
 				applyFormat={ this.applyFormat }
 				removeFormat={ this.removeFormat }
 				getActiveFormat={ this.getActiveFormat }
