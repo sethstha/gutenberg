@@ -1,8 +1,10 @@
-export function applyFormat( { formats, text, value, selection }, format, start, end ) {
+export function applyFormat(
+	{ formats, text, value, selection },
+	format,
+	start = selection.start,
+	end = selection.end
+) {
 	if ( value !== undefined ) {
-		start = start || selection.start;
-		end = end || selection.end;
-
 		if ( Array.isArray( value ) ) {
 			return {
 				selection,

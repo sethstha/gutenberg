@@ -1,4 +1,10 @@
-export function splice( { formats, text, selection, value }, start, deleteCount, textToInsert = '', formatsToInsert ) {
+export function splice(
+	{ formats, text, selection, value },
+	start,
+	deleteCount,
+	textToInsert = '',
+	formatsToInsert
+) {
 	if ( value !== undefined ) {
 		start = start || selection.start;
 		deleteCount = deleteCount || selection.end - selection.start;

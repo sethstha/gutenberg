@@ -1,8 +1,10 @@
-export function removeFormat( { formats, text, value, selection }, formatType, start, end ) {
+export function removeFormat(
+	{ formats, text, value, selection },
+	formatType,
+	start = selection.start,
+	end = selection.end
+) {
 	if ( value !== undefined ) {
-		start = start || selection.start;
-		end = end || selection.end;
-
 		if ( Array.isArray( value ) ) {
 			return {
 				selection,

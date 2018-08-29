@@ -1,8 +1,9 @@
-export function split( { text, formats, selection, value }, start, end ) {
+export function split(
+	{ text, formats, selection, value },
+	start = selection.start,
+	end = selection.end
+) {
 	if ( value !== undefined ) {
-		start = start || selection.start;
-		end = end || selection.end;
-
 		const [ startValue, endValue ] = split( value, start, end );
 
 		return [

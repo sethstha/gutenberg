@@ -5,7 +5,7 @@
 import { find } from 'lodash';
 
 export function getActiveFormat( { value, selection }, formatType ) {
-	if ( ! selection || ! selection.start ) {
+	if ( ! selection || selection.start === undefined ) {
 		return false;
 	}
 
