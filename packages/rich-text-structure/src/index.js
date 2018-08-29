@@ -777,6 +777,21 @@ export function split( { text, formats, selection, value }, start, end ) {
 	];
 }
 
+export function splitSearch( { text, formats }, string ) {
+	let nextStart = 0;
+
+	return text.split( string ).map( ( substring ) => {
+		const start = nextStart;
+
+		nextStart += string.length + substring.length;
+
+		return {
+			formats: formats.slice( start, start + substring.length ),
+			text: substring,
+		};
+	} );
+}
+
 export function isCollapsed( { selection } ) {
 	const { start, end } = selection;
 

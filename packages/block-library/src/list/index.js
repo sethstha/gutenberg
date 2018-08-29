@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, omit } from 'lodash';
+import { find, omit, flatMap } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,7 @@ import {
 	BlockControls,
 	RichText,
 } from '@wordpress/editor';
+import { splitSearch } from '@wordpress/rich-text-structure';
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -74,7 +75,9 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
 					return createBlock( 'core/list', {
-						values: blockAttributes.map( ( { content } ) => content ),
+						values: flatMap( blockAttributes, ( { content } ) => {
+							return splitSearch( content, '\n' );
+						} ),
 					} );
 				},
 			},
