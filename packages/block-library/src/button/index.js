@@ -32,7 +32,6 @@ const blockAttributes = {
 		attribute: 'title',
 	},
 	text: {
-		type: 'object',
 		source: 'rich-text',
 		selector: 'a',
 	},

@@ -1,39 +1,13 @@
-export function split(
-	{ text, formats, selection, value },
-	start = selection.start,
-	end = selection.end
-) {
-	if ( value !== undefined ) {
-		const [ startValue, endValue ] = split( value, start, end );
+export function split( record, string ) {
+	if ( typeof string !== 'string' ) {
+		if ( record.value !== undefined ) {
+			return splitRecordAtSelection( ...arguments );
+		}
 
-		return [
-			{
-				selection: {},
-				value: startValue,
-			},
-			{
-				selection: {
-					start: 0,
-					end: 0,
-				},
-				value: endValue,
-			},
-		];
+		return splitValueAtSelection( ...arguments );
 	}
 
-	return [
-		{
-			formats: formats.slice( 0, start ),
-			text: text.slice( 0, start ),
-		},
-		{
-			formats: formats.slice( end ),
-			text: text.slice( end ),
-		},
-	];
-}
-
-export function splitSearch( { text, formats }, string ) {
+	const { text, formats } = record;
 	let nextStart = 0;
 
 	return text.split( string ).map( ( substring ) => {
@@ -46,4 +20,39 @@ export function splitSearch( { text, formats }, string ) {
 			text: substring,
 		};
 	} );
+}
+
+function splitRecordAtSelection(
+	{ value, selection },
+	start = selection.start,
+	end = selection.end
+) {
+	const [ startValue, endValue ] = splitValueAtSelection( value, start, end );
+
+	return [
+		{
+			selection: {},
+			value: startValue,
+		},
+		{
+			selection: {
+				start: 0,
+				end: 0,
+			},
+			value: endValue,
+		},
+	];
+}
+
+function splitValueAtSelection( { text, formats }, start, end ) {
+	return [
+		{
+			formats: formats.slice( 0, start ),
+			text: text.slice( 0, start ),
+		},
+		{
+			formats: formats.slice( end ),
+			text: text.slice( end ),
+		},
+	];
 }

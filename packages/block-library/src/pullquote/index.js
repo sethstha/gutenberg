@@ -8,13 +8,11 @@ import {
 
 const blockAttributes = {
 	value: {
-		type: 'array',
 		source: 'rich-text',
 		selector: 'blockquote',
 		multiline: 'p',
 	},
 	citation: {
-		type: 'object',
 		source: 'rich-text',
 		selector: 'cite',
 	},

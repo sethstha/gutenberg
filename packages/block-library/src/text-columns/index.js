@@ -17,6 +17,7 @@ import {
 	RichText,
 } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
+import { create } from '@wordpress/rich-text-structure';
 
 export const name = 'core/text-columns';
 
@@ -46,16 +47,10 @@ export const settings = {
 			},
 			default: [
 				{
-					children: {
-						text: '',
-						formats: [],
-					},
+					children: create(),
 				},
 				{
-					children: {
-						text: '',
-						formats: [],
-					},
+					children: create(),
 				},
 			],
 		},

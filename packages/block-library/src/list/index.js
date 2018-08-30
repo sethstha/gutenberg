@@ -18,7 +18,7 @@ import {
 	BlockControls,
 	RichText,
 } from '@wordpress/editor';
-import { splitSearch } from '@wordpress/rich-text-structure';
+import { split } from '@wordpress/rich-text-structure';
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -47,7 +47,6 @@ const schema = {
 		default: false,
 	},
 	values: {
-		type: 'array',
 		source: 'rich-text',
 		selector: 'ol,ul',
 		multiline: 'li',
@@ -76,7 +75,7 @@ export const settings = {
 				transform: ( blockAttributes ) => {
 					return createBlock( 'core/list', {
 						values: flatMap( blockAttributes, ( { content } ) => {
-							return splitSearch( content, '\n' );
+							return split( content, '\n' );
 						} ),
 					} );
 				},

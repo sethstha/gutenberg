@@ -25,7 +25,6 @@ export const settings = {
 
 	attributes: {
 		content: {
-			type: 'object',
 			source: 'rich-text',
 			selector: 'pre',
 		},

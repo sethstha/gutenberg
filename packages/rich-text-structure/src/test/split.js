@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 
-import { split, splitSearch } from '../split';
+import { split } from '../split';
 
 describe( 'split', () => {
 	it( 'should split', () => {
@@ -183,6 +183,6 @@ describe( 'splitSearch', () => {
 			},
 		];
 
-		expect( splitSearch( record, ' ' ) ).toEqual( expected );
+		expect( split( record, ' ' ) ).toEqual( expected );
 	} );
 } );

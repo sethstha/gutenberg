@@ -32,7 +32,6 @@ export const settings = {
 			attribute: 'autoplay',
 		},
 		caption: {
-			type: 'object',
 			source: 'rich-text',
 			selector: 'figcaption',
 		},
