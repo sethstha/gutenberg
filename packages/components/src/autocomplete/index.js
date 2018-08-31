@@ -152,6 +152,17 @@ function getTextBeforeSelection( record ) {
 	return text.slice( 0, start );
 }
 
+function getTextAfterSelection( record ) {
+	const text = getTextContent( record );
+	let start = record.selection.start;
+
+	if ( Array.isArray( start ) ) {
+		start = start[ 1 ];
+	}
+
+	return text.slice( start );
+}
+
 export class Autocomplete extends Component {
 	static getInitialState() {
 		return {
@@ -182,13 +193,12 @@ export class Autocomplete extends Component {
 	}
 
 	insertCompletion( replacement ) {
+		const { open, query } = this.state;
 		const { record, onChange } = this.props;
 
-		replacement = replacement.slice( 1 + this.state.query.length );
+		replacement = replacement.slice( open.triggerPrefix.length + query.length );
 
-		const newRecord = splice( record, undefined, 0, replacement );
-
-		onChange( newRecord );
+		onChange( splice( record, undefined, 0, replacement ) );
 	}
 
 	select( option ) {
@@ -392,15 +402,29 @@ export class Autocomplete extends Component {
 			const prevText = getTextBeforeSelection( prevRecord );
 
 			if ( text !== prevText ) {
+				const textAfterSelection = getTextAfterSelection( record );
 				const allCompleters = map( completers, ( completer, idx ) => ( { ...completer, idx } ) );
-				const open = find( allCompleters, ( settings ) => settings.test( text ) );
+				const open = find( allCompleters, ( { triggerPrefix, allowContext } ) => {
+					const index = text.lastIndexOf( triggerPrefix );
+
+					if ( index === -1 ) {
+						return false;
+					}
+
+					if ( allowContext && ! allowContext( text.slice( 0, index ), textAfterSelection ) ) {
+						return false;
+					}
+
+					return /^\w*$/.test( text.slice( index + triggerPrefix.length ) );
+				} );
 
 				if ( ! open ) {
 					this.reset();
 					return;
 				}
 
-				const query = open.getQuery( text );
+				const match = text.match( new RegExp( `${ open.triggerPrefix }(\\w*)$` ) );
+				const query = match && match[ 1 ];
 				const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 
 				if ( open && ( ! wasOpen || open.idx !== wasOpen.idx || query !== wasQuery ) ) {
