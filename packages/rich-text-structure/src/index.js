@@ -9,5 +9,5 @@ export { isSelectionEqual } from './is-selection-equal';
 export { removeFormat } from './remove-format';
 export { splice } from './splice';
 export { split } from './split';
-export { toDOM, apply } from './to-dom';
+export { apply } from './to-dom';
 export { toString } from './to-string';

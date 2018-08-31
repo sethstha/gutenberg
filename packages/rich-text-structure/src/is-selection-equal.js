@@ -3,7 +3,7 @@ export function isSelectionEqual(
 	{ start: start2, end: end2 }
 ) {
 	// Comparing multiline selection.
-	if ( Array.isArray( start1 ) ) {
+	if ( Array.isArray( start1 ) && Array.isArray( start2 ) ) {
 		return (
 			start1[ 0 ] === start2[ 0 ] &&
 			start1[ 1 ] === start2[ 1 ] &&
