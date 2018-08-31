@@ -110,7 +110,6 @@ export function matcherFromSource( sourceConfig ) {
 		case 'text':
 			return text( sourceConfig.selector );
 		case 'children':
-		case 'rich-text':
 			return children( sourceConfig.selector, sourceConfig.multiline );
 		case 'node':
 			return node( sourceConfig.selector );
@@ -156,8 +155,9 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	let value;
 
-	if ( attributeSchema.source === 'rich-text' ) {
+	if ( attributeSchema.source === 'children' ) {
 		attributeSchema.default = create( null, attributeSchema.multiline );
+		attributeSchema.type = attributeSchema.multiline ? 'array' : 'object';
 	}
 
 	switch ( attributeSchema.source ) {
@@ -170,7 +170,6 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'html':
 		case 'text':
 		case 'children':
-		case 'rich-text':
 		case 'node':
 		case 'query':
 		case 'tag':

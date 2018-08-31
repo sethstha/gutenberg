@@ -47,7 +47,7 @@ const schema = {
 		default: false,
 	},
 	values: {
-		source: 'rich-text',
+		source: 'children',
 		selector: 'ol,ul',
 		multiline: 'li',
 	},

@@ -8,12 +8,12 @@ import {
 
 const blockAttributes = {
 	value: {
-		source: 'rich-text',
+		source: 'children',
 		selector: 'blockquote',
 		multiline: 'p',
 	},
 	citation: {
-		source: 'rich-text',
+		source: 'children',
 		selector: 'cite',
 	},
 };
@@ -85,7 +85,6 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			citation: {
-				type: 'array',
 				source: 'children',
 				selector: 'footer',
 			},

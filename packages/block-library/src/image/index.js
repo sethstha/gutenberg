@@ -39,7 +39,7 @@ const blockAttributes = {
 		default: '',
 	},
 	caption: {
-		source: 'rich-text',
+		source: 'children',
 		selector: 'figcaption',
 	},
 	href: {

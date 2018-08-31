@@ -142,11 +142,6 @@ class LinkContainer extends Component {
 	render() {
 		const { link } = this.props;
 		const { inputValue, settingsVisible, opensInNewWindow, selectionKey } = this.state;
-
-		if ( ! link ) {
-			return null;
-		}
-
 		const linkSettings = settingsVisible && (
 			<div className="editor-format-toolbar__link-modal-line editor-format-toolbar__link-settings">
 				<ToggleControl

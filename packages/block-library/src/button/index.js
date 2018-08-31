@@ -32,7 +32,7 @@ const blockAttributes = {
 		attribute: 'title',
 	},
 	text: {
-		source: 'rich-text',
+		source: 'children',
 		selector: 'a',
 	},
 	backgroundColor: {
