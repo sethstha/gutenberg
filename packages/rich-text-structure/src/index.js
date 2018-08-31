@@ -5,6 +5,7 @@ export { getActiveFormat } from './get-active-format';
 export { getTextContent } from './get-text-content';
 export { isCollapsed } from './is-collapsed';
 export { isEmpty } from './is-empty';
+export { isSelectionEqual } from './is-selection-equal';
 export { removeFormat } from './remove-format';
 export { splice } from './splice';
 export { split } from './split';

@@ -38,6 +38,7 @@ import {
 	split,
 	toString,
 	create,
+	isSelectionEqual,
 } from '@wordpress/rich-text-structure';
 
 /**
@@ -97,6 +98,8 @@ export class RichText extends Component {
 		this.onInput = this.onInput.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.getRecord = this.getRecord.bind( this );
+		this.createRecord = this.createRecord.bind( this );
+		this.applyRecord = this.applyRecord.bind( this );
 		this.applyFormat = this.applyFormat.bind( this );
 		this.removeFormat = this.removeFormat.bind( this );
 		this.getActiveFormat = this.getActiveFormat.bind( this );
@@ -238,6 +241,21 @@ export class RichText extends Component {
 			value: this.props.value,
 			selection: this.state.selection,
 		};
+	}
+
+	createRecord() {
+		const { multiline } = this.props;
+		const rootNode = this.editor.getBody();
+		const range = this.editor.selection.getRng();
+
+		return createWithSelection( rootNode, range, multiline, richTextStructureSettings );
+	}
+
+	applyRecord( record ) {
+		const { multiline } = this.props;
+		const rootNode = this.editor.getBody();
+
+		apply( record, rootNode, multiline );
 	}
 
 	/**
@@ -423,84 +441,50 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles the `input` event: sync the content and handle transformations.
+	 * Handle input on the next selection change event.
 	 */
 	onInput() {
-		const { multiline } = this.props;
-		const rootNode = this.editor.getBody();
-		const range = this.editor.selection.getRng();
-		let record = createWithSelection( rootNode, range, multiline, richTextStructureSettings );
+		const record = this.createRecord();
 		const transformed = this.patterns.reduce( ( accu, transform ) => transform( accu ), record );
 
-		if ( record !== transformed ) {
-			apply( transformed, this.editor.getBody(), multiline );
-			record = transformed;
-		}
-
-		this.savedContent = record.value;
-		this.props.onChange( record.value );
+		// Don't apply changes if there's no transform. Content will be up to
+		// date. In the future we could always let it flow back in the live DOM
+		// if there are no performance issues.
+		this.onChange( transformed, record === transformed );
 	}
 
 	/**
 	 * Handles the `selectionchange` event: sync the selection to local state.
 	 */
 	onSelectionChange() {
-		const rootNode = this.editor.getBody();
-
 		// Ensure it's the active element. This is a global event.
-		if ( document.activeElement !== rootNode ) {
+		if ( document.activeElement !== this.editor.getBody() ) {
 			return;
 		}
 
-		const range = this.editor.selection.getRng();
-		const { multiline } = this.props;
-		const { selection } = createWithSelection( rootNode, range, multiline, richTextStructureSettings );
-		const { start: nextStart, end: nextEnd } = selection;
-		const { start, end } = this.state.selection;
+		const { selection } = this.createRecord();
 
-		// Only set state if it's actually different.
-		if ( multiline ) {
-			if (
-				start !== nextStart ||
-				end !== nextEnd ||
-				start[ 0 ] !== nextStart[ 0 ] ||
-				start[ 1 ] !== nextStart[ 1 ] ||
-				end[ 0 ] !== nextEnd[ 0 ] ||
-				end[ 1 ] !== nextEnd[ 1 ]
-			) {
-				this.setState( { selection } );
-			}
-		} else if ( start !== nextStart || end !== nextEnd ) {
-			this.setState( { selection } );
+		if ( ! isSelectionEqual( selection, this.state.selection ) ) {
+			this.setState( { selection: selection } );
 		}
 	}
 
 	/**
-	 * Sync the value to global state.
+	 * Sync the value to global state. The node tree and selection will also be
+	 * updated if differences are found.
 	 *
-	 * - If a record is provided, that record's value will be synced, the node
-	 *   tree will be updated with the value, and the provided record's
-	 *   selection will be set.
-	 * - If no record is provided (such as after an input event), the node
-	 *   tree will be converted to the right structure and synced. In the
-	 *   future, the node tree and selection may be updated if they are
-	 *   different after conversion.
-	 *
-	 * @param {Object} record The record to sync and apply. Optional.
+	 * @param {Object}  record        The record to sync and apply.
+	 * @param {boolean} _withoutApply If true, the record won't be applied to
+	 *                                the live DOM.
 	 */
-	onChange( record ) {
-		const { multiline } = this.props;
-		const rootNode = this.editor.getBody();
-
-		if ( ! record ) {
-			const range = this.editor.selection.getRng();
-			record = createWithSelection( rootNode, range, multiline, richTextStructureSettings );
-		} else {
-			apply( record, rootNode, multiline );
+	onChange( record, _withoutApply ) {
+		if ( ! _withoutApply ) {
+			this.applyRecord( record );
 		}
 
 		this.savedContent = record.value;
 		this.props.onChange( record.value );
+		this.setState( { selection: record.selection } );
 	}
 
 	onCreateUndoLevel( event ) {
@@ -519,7 +503,7 @@ export class RichText extends Component {
 		// input event. Avoid dispatching an action if the original event is
 		// blur because the content will already be up-to-date.
 		if ( ! event || ! event.originalEvent || event.originalEvent.type !== 'blur' ) {
-			this.onChange();
+			this.onChange( this.createRecord(), true );
 		}
 
 		this.props.onCreateUndoLevel();
@@ -713,8 +697,7 @@ export class RichText extends Component {
 		// The input event does not fire when the whole field is selected and
 		// BACKSPACE is pressed.
 		if ( keyCode === BACKSPACE ) {
-			this.onChange();
-			this.onSelectionChange();
+			this.onChange( this.createRecord(), true );
 		}
 
 		// `scrollToRect` is called on `nodechange`, whereas calling it on
@@ -763,8 +746,8 @@ export class RichText extends Component {
 	 * @param {Object} context The context for splitting.
 	 */
 	splitContent( blocks = [], context = {} ) {
-		const { onSplit, value } = this.props;
-		const { selection } = this.state;
+		const { onSplit } = this.props;
+		const { value, selection } = this.createRecord();
 
 		if ( ! onSplit ) {
 			return;
@@ -817,7 +800,7 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { tagName, value, multiline } = this.props;
+		const { tagName, value } = this.props;
 		const { selection } = this.state;
 
 		if (
@@ -826,10 +809,10 @@ export class RichText extends Component {
 			value !== prevProps.value &&
 			value !== this.savedContent
 		) {
-			apply( {
+			this.applyRecord( {
 				value,
 				selection: this.editor.hasFocus() ? selection : undefined,
-			}, this.editor.getBody(), multiline );
+			} );
 		}
 	}
 
