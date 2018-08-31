@@ -61,6 +61,25 @@ describe( 'create', () => {
 		} );
 	} );
 
+	it( 'should reference formats', () => {
+		const element = createNode( '<p><em>te<strong>st</strong></em></p>' );
+		const value = create( element );
+
+		expect( value ).toEqual( {
+			formats: [
+				[ { type: 'em' } ],
+				[ { type: 'em' } ],
+				[ { type: 'em' }, { type: 'strong' } ],
+				[ { type: 'em' }, { type: 'strong' } ],
+			],
+			text: 'test',
+		} );
+
+		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 1 ][ 0 ] );
+		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 2 ][ 0 ] );
+		expect( value.formats[ 2 ][ 1 ] ).toBe( value.formats[ 3 ][ 1 ] );
+	} );
+
 	it( 'should extract multiline text', () => {
 		const element = createNode( '<div><p>one <em>two</em> three</p><p>test</p></div>' );
 		const range = {
