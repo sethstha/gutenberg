@@ -30,14 +30,14 @@ import { isURL } from '@wordpress/url';
 import {
 	isEmpty,
 	concat,
-	createWithSelection,
+	create,
 	apply,
 	applyFormat,
 	removeFormat,
 	getActiveFormat,
 	split,
 	toString,
-	create,
+	createValue,
 	isSelectionEqual,
 } from '@wordpress/rich-text-structure';
 
@@ -248,7 +248,7 @@ export class RichText extends Component {
 		const rootNode = this.editor.getBody();
 		const range = this.editor.selection.getRng();
 
-		return createWithSelection( rootNode, range, multiline, richTextStructureSettings );
+		return create( rootNode, range, multiline, richTextStructureSettings );
 	}
 
 	applyRecord( record ) {
@@ -672,8 +672,8 @@ export class RichText extends Component {
 				} );
 
 				const { multiline } = this.props;
-				const before = create( beforeFragment, multiline, richTextStructureSettings );
-				const after = create( afterFragment, multiline, richTextStructureSettings );
+				const before = createValue( beforeFragment, multiline, richTextStructureSettings );
+				const after = createValue( afterFragment, multiline, richTextStructureSettings );
 
 				this.props.onSplit( before, after );
 			} else {

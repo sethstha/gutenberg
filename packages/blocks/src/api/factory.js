@@ -20,7 +20,7 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
-import { create } from '@wordpress/rich-text-structure';
+import { createValue } from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
@@ -47,7 +47,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 		if ( undefined !== value ) {
 			result[ key ] = value;
 		} else if ( schema.source === 'children' ) {
-			result[ key ] = create( null, schema.multiline );
+			result[ key ] = createValue( null, schema.multiline );
 		} else if ( schema.hasOwnProperty( 'default' ) ) {
 			result[ key ] = schema.default;
 		}

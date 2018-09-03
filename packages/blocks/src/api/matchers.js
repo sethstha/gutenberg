@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { create } from '@wordpress/rich-text-structure';
+import { createValue } from '@wordpress/rich-text-structure';
 
 /**
  * External dependencies
@@ -16,7 +16,7 @@ export const children = ( selector, multiline ) => {
 			match = domNode.querySelector( selector );
 		}
 
-		return create( match, multiline );
+		return createValue( match, multiline );
 	};
 };
 
@@ -28,6 +28,6 @@ export const node = ( selector ) => {
 			match = domNode.querySelector( selector );
 		}
 
-		return create( match );
+		return createValue( match );
 	};
 };

@@ -17,7 +17,7 @@ import {
 	RichText,
 } from '@wordpress/editor';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import { create } from '@wordpress/rich-text-structure';
+import { createValue } from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
@@ -197,7 +197,7 @@ export const settings = {
 			migrate( attributes ) {
 				return {
 					...attributes,
-					content: create( attributes.content ),
+					content: createValue( attributes.content ),
 				};
 			},
 		},

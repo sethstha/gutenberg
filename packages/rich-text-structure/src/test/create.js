@@ -9,7 +9,7 @@ import { JSDOM } from 'jsdom';
  * Internal dependencies
  */
 
-import { create, createWithSelection } from '../create';
+import { create, createValue } from '../create';
 import { toString } from '../to-string';
 
 const { window } = new JSDOM();
@@ -31,7 +31,7 @@ describe( 'create', () => {
 			endContainer: element.querySelector( 'strong' ).firstChild,
 		};
 
-		deepEqual( createWithSelection( element, range ), {
+		deepEqual( create( element, range ), {
 			value: {
 				formats: [
 					undefined,
@@ -63,7 +63,7 @@ describe( 'create', () => {
 
 	it( 'should reference formats', () => {
 		const element = createNode( '<p><em>te<strong>st</strong></em></p>' );
-		const value = create( element );
+		const value = createValue( element );
 
 		expect( value ).toEqual( {
 			formats: [
@@ -89,7 +89,7 @@ describe( 'create', () => {
 			endContainer: element.lastChild,
 		};
 
-		deepEqual( createWithSelection( element, range, 'p' ), {
+		deepEqual( create( element, range, 'p' ), {
 			value: [
 				{
 					formats: [
@@ -129,7 +129,7 @@ describe( 'create', () => {
 	it( 'should extract multiline text list', () => {
 		const element = createNode( '<ul><li>one<ul><li>two</li></ul></li><li>three</li></ul>' );
 
-		deepEqual( create( element, 'li' ), [
+		deepEqual( createValue( element, 'li' ), [
 			{
 				formats: [
 					undefined,
@@ -169,7 +169,7 @@ describe( 'create', () => {
 			filterString: ( string ) => string.replace( '\uFEFF', '' ),
 		};
 
-		deepEqual( createWithSelection( element, range, false, settings ), {
+		deepEqual( create( element, range, false, settings ), {
 			value: {
 				formats: [
 					[ { type: 'strong' } ],
@@ -201,7 +201,7 @@ describe( 'create', () => {
 			filterString: ( string ) => string.replace( '\uFEFF', '' ),
 		};
 
-		deepEqual( createWithSelection( element, range, false, settings ), {
+		deepEqual( create( element, range, false, settings ), {
 			value: {
 				formats: [
 					[ { type: 'strong' } ],
@@ -238,7 +238,7 @@ describe( 'create', () => {
 			endContainer: element.lastChild,
 		};
 
-		deepEqual( createWithSelection( element, range1, false ), {
+		deepEqual( create( element, range1, false ), {
 			value: {
 				formats: [
 					undefined,
@@ -259,7 +259,7 @@ describe( 'create', () => {
 			},
 		} );
 
-		deepEqual( createWithSelection( element, range2, false ), {
+		deepEqual( create( element, range2, false ), {
 			value: {
 				formats: [
 					undefined,
@@ -293,30 +293,30 @@ describe( 'create with settings', () => {
 	it( 'should skip bogus 1', () => {
 		const HTML = '<br data-mce-bogus="true">';
 
-		deepEqual( toString( create( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '' );
+		deepEqual( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '' );
 	} );
 
 	it( 'should skip bogus 2', () => {
 		const HTML = '<strong data-mce-bogus="true"></strong>';
 
-		deepEqual( toString( create( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '' );
+		deepEqual( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '' );
 	} );
 
 	it( 'should skip bogus 3', () => {
 		const HTML = '<strong data-mce-bogus="true">test <em>test</em></strong>';
 
-		deepEqual( toString( create( createNode( `<p>${ HTML }</p>` ), false, settings ) ), 'test <em>test</em>' );
+		deepEqual( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ), 'test <em>test</em>' );
 	} );
 
 	it( 'should skip bogus 4', () => {
 		const HTML = '<strong data-mce-bogus="all">test</strong>';
 
-		deepEqual( toString( create( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '' );
+		deepEqual( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '' );
 	} );
 
 	it( 'should skip bogus 5', () => {
 		const HTML = '<strong data-mce-selected="inline-boundary">test&#65279;</strong>';
 
-		deepEqual( toString( create( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '<strong>test</strong>' );
+		deepEqual( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '<strong>test</strong>' );
 	} );
 } );

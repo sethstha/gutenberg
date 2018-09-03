@@ -10,7 +10,7 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
-import { create } from '@wordpress/rich-text-structure';
+import { createValue } from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
@@ -156,7 +156,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 	let value;
 
 	if ( attributeSchema.source === 'children' ) {
-		attributeSchema.default = create( null, attributeSchema.multiline );
+		attributeSchema.default = createValue( null, attributeSchema.multiline );
 		attributeSchema.type = attributeSchema.multiline ? 'array' : 'object';
 	}
 

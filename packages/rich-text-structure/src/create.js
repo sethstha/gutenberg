@@ -29,7 +29,7 @@ function createElement( html ) {
  *
  * @return {Object} A rich text record.
  */
-export function createWithSelection( element, range, multiline, settings ) {
+export function create( element, range, multiline, settings ) {
 	if ( typeof element === 'string' ) {
 		element = createElement( element );
 	}
@@ -82,8 +82,8 @@ export function createWithSelection( element, range, multiline, settings ) {
  *
  * @return {Object} A rich text value object.
  */
-export function create( element, multiline, settings ) {
-	return createWithSelection( element, null, multiline, settings ).value;
+export function createValue( element, multiline, settings ) {
+	return create( element, null, multiline, settings ).value;
 }
 
 /**

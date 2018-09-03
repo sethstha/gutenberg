@@ -52,55 +52,17 @@ function getNodeByPath( node, path ) {
 	};
 }
 
-/**
- * Creates an element tree and selection paths from a rich text record.
- *
- * @param {Object}  record    The record to create from.
- * @param {string}  multiline Multiline tag.
- * @param {?string} _tag      Internal use only.
- *
- * @return {Object} Object with the element tree and selection paths.
- */
-export function toDOM( { value, selection = {} }, multiline, _tag ) {
+export function recordToDom( { value, selection = {} }, tag ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 	let { body } = doc;
 	let startPath = [];
 	let endPath = [];
 
-	if ( multiline ) {
-		value.forEach( ( piece, index ) => {
-			const start = selection.start && selection.start[ 0 ] === index ? selection.start[ 1 ] : undefined;
-			const end = selection.end && selection.end[ 0 ] === index ? selection.end[ 1 ] : undefined;
-			const dom = toDOM( {
-				value: piece,
-				selection: {
-					start,
-					end,
-				},
-			}, false, multiline );
-
-			body.appendChild( dom.body );
-
-			if ( dom.selection.startPath.length ) {
-				startPath = [ index, ...dom.selection.startPath ];
-			}
-
-			if ( dom.selection.endPath.length ) {
-				endPath = [ index, ...dom.selection.endPath ];
-			}
-		} );
-
-		return {
-			body,
-			selection: { startPath, endPath },
-		};
-	}
-
 	const { formats, text } = value;
 	const { start, end } = selection;
 
-	if ( _tag ) {
-		body = body.appendChild( doc.createElement( _tag ) );
+	if ( tag ) {
+		body = body.appendChild( doc.createElement( tag ) );
 	}
 
 	for ( let i = 0, max = text.length; i < max; i++ ) {
@@ -182,18 +144,56 @@ export function toDOM( { value, selection = {} }, multiline, _tag ) {
 	};
 }
 
+export function multilineRecordToDom( { value, selection }, tag ) {
+	const doc = document.implementation.createHTMLDocument( '' );
+	const { body } = doc;
+	let startPath = [];
+	let endPath = [];
+
+	value.forEach( ( piece, index ) => {
+		const start = selection.start && selection.start[ 0 ] === index ? selection.start[ 1 ] : undefined;
+		const end = selection.end && selection.end[ 0 ] === index ? selection.end[ 1 ] : undefined;
+		const dom = recordToDom( {
+			value: piece,
+			selection: { start, end },
+		}, tag );
+
+		body.appendChild( dom.body );
+
+		if ( dom.selection.startPath.length ) {
+			startPath = [ index, ...dom.selection.startPath ];
+		}
+
+		if ( dom.selection.endPath.length ) {
+			endPath = [ index, ...dom.selection.endPath ];
+		}
+	} );
+
+	return {
+		body,
+		selection: { startPath, endPath },
+	};
+}
+
 /**
  * Applies the given element tree and selection to the live DOM (very basic diff
  * for now).
  *
- * @param {Object}      value     Object with the element tree and selection
- *                                paths to apply.
+ * @param {Object}      record    Record to apply.
  * @param {HTMLElement} current   The live root node to apply the element tree
  *                                to.
- * @param {string}     multiline Multiline tag.
+ * @param {string}      multiline Multiline tag.
  */
-export function apply( value, current, multiline ) {
-	const { body: future, selection } = toDOM( value, multiline );
+export function apply( record, current, multiline ) {
+	// Construct a new element tree in memory
+	const toDom = multiline ? multilineRecordToDom : recordToDom;
+	const { body, selection } = toDom( record, multiline );
+
+	applyValue( body, current );
+	applySelection( selection, current );
+}
+
+export function applyValue( future, current ) {
 	let i = 0;
 
 	while ( future.firstChild ) {
@@ -218,11 +218,9 @@ export function apply( value, current, multiline ) {
 	while ( current.childNodes[ i ] ) {
 		current.removeChild( current.childNodes[ i ] );
 	}
+}
 
-	if ( ! selection.startPath.length ) {
-		return;
-	}
-
+export function applySelection( selection, current ) {
 	const { node: startContainer, offset: startOffset } = getNodeByPath( current, selection.startPath );
 	const { node: endContainer, offset: endOffset } = getNodeByPath( current, selection.endPath );
 
