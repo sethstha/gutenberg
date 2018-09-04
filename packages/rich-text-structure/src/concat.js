@@ -3,9 +3,9 @@ export function concat( record, ...records ) {
 		return record.concat( ...records );
 	}
 
-	return records.reduce( ( accu, { formats, text } ) => {
-		accu.text += text;
-		accu.formats.push( ...formats );
-		return accu;
+	return records.reduce( ( accumlator, { formats, text } ) => {
+		accumlator.text += text;
+		accumlator.formats.push( ...formats );
+		return accumlator;
 	}, { ...record } );
 }
