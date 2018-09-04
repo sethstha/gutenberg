@@ -12,11 +12,11 @@ const { TEXT_NODE, ELEMENT_NODE } = window.Node;
  * @return {HTMLBodyElement} Body element with parsed HTML.
  */
 function createElement( html ) {
-	const document = document.implementation.createHTMLDocument( '' );
+	const htmlDocument = document.implementation.createHTMLDocument( '' );
 
-	document.body.innerHTML = html;
+	htmlDocument.body.innerHTML = html;
 
-	return document.body;
+	return htmlDocument.body;
 }
 
 /**
