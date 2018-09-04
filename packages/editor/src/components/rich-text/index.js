@@ -281,7 +281,7 @@ export class RichText extends Component {
 	 *
 	 * @param {string} formatType The type of format to check.
 	 *
-	 * @return {boolean} Wether the format is active or not.
+	 * @return {boolean} Whether the format is active or not.
 	 */
 	getActiveFormat( formatType ) {
 		return getActiveFormat( this.getRecord(), formatType );
