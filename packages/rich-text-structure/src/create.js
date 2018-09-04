@@ -45,28 +45,28 @@ export function create( element, range, multiline, settings ) {
 		};
 	}
 
-	return Array.from( element.childNodes ).reduce( ( acc, child, index ) => {
+	return Array.from( element.childNodes ).reduce( ( accumlator, child, index ) => {
 		if ( child.nodeName.toLowerCase() === multiline ) {
 			const { selection, value } = createRecord( child, range, settings );
 
 			if ( range ) {
 				if ( selection.start !== undefined ) {
-					acc.selection.start = [ index ].concat( selection.start );
+					accumlator.selection.start = [ index ].concat( selection.start );
 				} else if ( child === range.startContainer ) {
-					acc.selection.start = [ index ];
+					accumlator.selection.start = [ index ];
 				}
 
 				if ( selection.end !== undefined ) {
-					acc.selection.end = [ index ].concat( selection.end );
+					accumlator.selection.end = [ index ].concat( selection.end );
 				} else if ( child === range.endContainer ) {
-					acc.selection.end = [ index ];
+					accumlator.selection.end = [ index ];
 				}
 			}
 
-			acc.value.push( value );
+			accumlator.value.push( value );
 		}
 
-		return acc;
+		return accumlator;
 	}, {
 		value: [],
 		selection: {},
