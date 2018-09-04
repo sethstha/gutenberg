@@ -168,7 +168,8 @@ class LinkContainer extends Component {
 								className="editor-format-toolbar__link-modal"
 								onKeyPress={ stopKeyPropagation }
 								onKeyDown={ this.onKeyDown }
-								onSubmit={ this.submitLink }>
+								onSubmit={ this.submitLink }
+							>
 								<div className="editor-format-toolbar__link-modal-line">
 									<URLInput value={ inputValue } onChange={ this.onChangeInputValue } />
 									<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
