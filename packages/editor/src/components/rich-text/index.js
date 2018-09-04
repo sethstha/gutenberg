@@ -445,7 +445,7 @@ export class RichText extends Component {
 	 */
 	onInput() {
 		const record = this.createRecord();
-		const transformed = this.patterns.reduce( ( accu, transform ) => transform( accu ), record );
+		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
 
 		// Don't apply changes if there's no transform. Content will be up to
 		// date. In the future we could always let it flow back in the live DOM
