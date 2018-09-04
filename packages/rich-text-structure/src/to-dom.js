@@ -65,10 +65,12 @@ export function recordToDom( { value, selection = {} }, tag ) {
 		body = body.appendChild( doc.createElement( tag ) );
 	}
 
-	for ( let i = 0, max = text.length; i < max; i++ ) {
+	body.appendChild( doc.createTextNode( '' ) );
+
+	for ( let i = 0, max = text.length + 1; i < max; i++ ) {
 		const character = text.charAt( i );
 		const nextFormats = formats[ i ] || [];
-		let pointer = body.lastChild || body.appendChild( doc.createTextNode( '' ) );
+		let pointer = body.lastChild;
 
 		if ( nextFormats ) {
 			nextFormats.forEach( ( { type, attributes, object } ) => {
@@ -85,16 +87,23 @@ export function recordToDom( { value, selection = {} }, tag ) {
 				}
 
 				parentNode.appendChild( newNode );
+
+				if ( pointer.nodeType === TEXT_NODE && pointer.nodeValue === '' ) {
+					pointer.parentNode.removeChild( pointer );
+				}
+
 				pointer = ( object ? parentNode : newNode ).appendChild( doc.createTextNode( '' ) );
 			} );
 		}
 
-		if ( character === '\n' ) {
-			pointer = pointer.parentNode.appendChild( doc.createElement( 'br' ) );
-		} else if ( pointer.nodeType === TEXT_NODE ) {
-			pointer.appendData( character );
-		} else {
-			pointer = pointer.parentNode.appendChild( doc.createTextNode( character ) );
+		if ( character ) {
+			if ( character === '\n' ) {
+				pointer = pointer.parentNode.appendChild( doc.createElement( 'br' ) );
+			} else if ( pointer.nodeType === TEXT_NODE ) {
+				pointer.appendData( character );
+			} else {
+				pointer = pointer.parentNode.appendChild( doc.createTextNode( character ) );
+			}
 		}
 
 		if ( start === i ) {
@@ -105,36 +114,6 @@ export function recordToDom( { value, selection = {} }, tag ) {
 		if ( end === i ) {
 			const initialPath = pointer.nodeValue ? [ pointer.nodeValue.length - 1 ] : [];
 			endPath = createPathToNode( pointer, body, initialPath );
-		}
-	}
-
-	const last = text.length;
-
-	if ( formats[ last ] ) {
-		formats[ last ].reduce( ( element, { type, attributes } ) => {
-			const newNode = doc.createElement( type );
-
-			for ( const key in attributes ) {
-				newNode.setAttribute( key, attributes[ key ] );
-			}
-
-			return element.appendChild( newNode );
-		}, body );
-	}
-
-	if ( start === last || end === last ) {
-		let pointer = body.lastChild;
-
-		if ( pointer.nodeType !== TEXT_NODE ) {
-			pointer = pointer.parentNode.appendChild( doc.createTextNode( '' ) );
-		}
-
-		if ( start === last ) {
-			startPath = createPathToNode( pointer, body, [ 0 ] );
-		}
-
-		if ( end === last ) {
-			endPath = createPathToNode( pointer, body, [ 0 ] );
 		}
 	}
 

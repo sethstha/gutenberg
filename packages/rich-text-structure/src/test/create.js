@@ -2,7 +2,6 @@
  * External dependencies
  */
 
-import { deepEqual } from 'assert';
 import { JSDOM } from 'jsdom';
 
 /**
@@ -31,7 +30,7 @@ describe( 'create', () => {
 			endContainer: element.querySelector( 'strong' ).firstChild,
 		};
 
-		deepEqual( create( element, range ), {
+		expect( create( element, range ) ).toEqual( {
 			value: {
 				formats: [
 					undefined,
@@ -89,7 +88,7 @@ describe( 'create', () => {
 			endContainer: element.lastChild,
 		};
 
-		deepEqual( create( element, range, 'p' ), {
+		expect( create( element, range, 'p' ) ).toEqual( {
 			value: [
 				{
 					formats: [
@@ -129,7 +128,7 @@ describe( 'create', () => {
 	it( 'should extract multiline text list', () => {
 		const element = createNode( '<ul><li>one<ul><li>two</li></ul></li><li>three</li></ul>' );
 
-		deepEqual( createValue( element, 'li' ), [
+		expect( createValue( element, 'li' ) ).toEqual( [
 			{
 				formats: [
 					undefined,
@@ -169,7 +168,7 @@ describe( 'create', () => {
 			filterString: ( string ) => string.replace( '\uFEFF', '' ),
 		};
 
-		deepEqual( create( element, range, false, settings ), {
+		expect( create( element, range, false, settings ) ).toEqual( {
 			value: {
 				formats: [
 					[ { type: 'strong' } ],
@@ -201,7 +200,7 @@ describe( 'create', () => {
 			filterString: ( string ) => string.replace( '\uFEFF', '' ),
 		};
 
-		deepEqual( create( element, range, false, settings ), {
+		expect( create( element, range, false, settings ) ).toEqual( {
 			value: {
 				formats: [
 					[ { type: 'strong' } ],
@@ -238,7 +237,7 @@ describe( 'create', () => {
 			endContainer: element.lastChild,
 		};
 
-		deepEqual( create( element, range1, false ), {
+		expect( create( element, range1, false ) ).toEqual( {
 			value: {
 				formats: [
 					undefined,
@@ -259,7 +258,7 @@ describe( 'create', () => {
 			},
 		} );
 
-		deepEqual( create( element, range2, false ), {
+		expect( create( element, range2, false ) ).toEqual( {
 			value: {
 				formats: [
 					undefined,
@@ -293,30 +292,30 @@ describe( 'create with settings', () => {
 	it( 'should skip bogus 1', () => {
 		const HTML = '<br data-mce-bogus="true">';
 
-		deepEqual( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '' );
+		expect( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
 	} );
 
 	it( 'should skip bogus 2', () => {
 		const HTML = '<strong data-mce-bogus="true"></strong>';
 
-		deepEqual( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '' );
+		expect( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
 	} );
 
 	it( 'should skip bogus 3', () => {
 		const HTML = '<strong data-mce-bogus="true">test <em>test</em></strong>';
 
-		deepEqual( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ), 'test <em>test</em>' );
+		expect( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( 'test <em>test</em>' );
 	} );
 
 	it( 'should skip bogus 4', () => {
 		const HTML = '<strong data-mce-bogus="all">test</strong>';
 
-		deepEqual( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '' );
+		expect( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
 	} );
 
 	it( 'should skip bogus 5', () => {
 		const HTML = '<strong data-mce-selected="inline-boundary">test&#65279;</strong>';
 
-		deepEqual( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ), '<strong>test</strong>' );
+		expect( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '<strong>test</strong>' );
 	} );
 } );
