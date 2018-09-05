@@ -23,7 +23,7 @@ import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { Slot } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { rawHandler } from '@wordpress/blocks';
+import { rawHandler, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
@@ -39,6 +39,7 @@ import {
 	toString,
 	createValue,
 	isSelectionEqual,
+	getTextContent,
 } from '@wordpress/rich-text-structure';
 
 /**
@@ -50,7 +51,7 @@ import { FORMATTING_CONTROLS } from './formatting-controls';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
-import patterns from './patterns';
+import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import TokenUI from './tokens/ui';
 
@@ -78,7 +79,7 @@ const richTextStructureSettings = {
 };
 
 export class RichText extends Component {
-	constructor( { value } ) {
+	constructor( { value, onReplace, multiline } ) {
 		super( ...arguments );
 
 		this.onInit = this.onInit.bind( this );
@@ -105,9 +106,12 @@ export class RichText extends Component {
 		this.getActiveFormat = this.getActiveFormat.bind( this );
 		this.toggleFormat = this.toggleFormat.bind( this );
 
-		this.containerRef = createRef();
-		this.patterns = patterns.call( this );
 		this.savedContent = value;
+		this.containerRef = createRef();
+		this.patterns = getPatterns( { onReplace, multiline } );
+		this.enterPatterns = getBlockTransforms( 'from' ).filter( ( { type, trigger } ) =>
+			type === 'pattern' && trigger === 'enter'
+		);
 
 		this.state = {
 			selection: {},
@@ -171,8 +175,6 @@ export class RichText extends Component {
 		// The change event in TinyMCE fires every time an undo level is added.
 		editor.on( 'change', this.onCreateUndoLevel );
 		editor.on( 'selectionchange', this.onSelectionChange );
-
-		patterns.apply( this, [ editor ] );
 
 		let { unstableOnSetup: onSetup } = this.props;
 		if ( ! onSetup && typeof this.props.onSetup === 'function' ) {
@@ -640,6 +642,25 @@ export class RichText extends Component {
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
 		if ( keyCode === ENTER ) {
+			if ( this.props.onReplace ) {
+				const text = getTextContent( this.getRecord() );
+				const transformation = findTransform( this.enterPatterns, ( item ) => {
+					return item.regExp.test( text );
+				} );
+
+				if ( transformation ) {
+					// Calling onReplace() will destroy the editor, so it's
+					// important that we stop other handlers (e.g. ones
+					// registered by TinyMCE) from also handling this event.
+					event.stopImmediatePropagation();
+					event.preventDefault();
+					this.props.onReplace( [
+						transformation.transform( { content: text } ),
+					] );
+					return;
+				}
+			}
+
 			if ( this.props.multiline ) {
 				if ( ! this.props.onSplit ) {
 					return;

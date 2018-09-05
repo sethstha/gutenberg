@@ -65,7 +65,7 @@ class LinkContainer extends Component {
 			} );
 		}
 
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].includes( event.keyCode ) ) {
+		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
 			// Stop the key event from propagating up to maybeStartTyping in BlockListBlock.
 			event.stopPropagation();
 		}

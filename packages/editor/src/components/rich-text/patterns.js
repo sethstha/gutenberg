@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, groupBy } from 'lodash';
+import { filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,13 +9,10 @@ import { filter, groupBy } from 'lodash';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { splice, applyFormat, getTextContent } from '@wordpress/rich-text-structure';
 
-export default function() {
-	const { onReplace, multiline } = this.props;
-
-	const {
-		// enter: enterPatterns,
-		undefined: patterns,
-	} = groupBy( filter( getBlockTransforms( 'from' ), { type: 'pattern' } ), 'trigger' );
+export function getPatterns( { onReplace, multiline } ) {
+	const patterns = filter( getBlockTransforms( 'from' ), ( { type, trigger } ) => {
+		return type === 'pattern' && trigger === undefined;
+	} );
 
 	return [
 		( record ) => {
@@ -43,24 +40,6 @@ export default function() {
 
 			return record;
 		},
-		// To do: only on enter.
-		// ( record ) => {
-		// 	if ( ! onReplace ) {
-		// 		return record;
-		// 	}
-
-		// 	const transformation = findTransform( enterPatterns, ( item ) => {
-		// 		return item.regExp.test( record.text );
-		// 	} );
-
-		// 	if ( ! transformation ) {
-		// 		return record;
-		// 	}
-
-		// 	const block = transformation.transform( { content: record.text } );
-
-		// 	onReplace( [ block ] );
-		// },
 		( record ) => {
 			if ( multiline ) {
 				return record;
@@ -68,7 +47,7 @@ export default function() {
 
 			const text = getTextContent( record );
 
-			if ( text.includes( '`' ) ) {
+			if ( text.indexOf( '`' ) === -1 ) {
 				return record;
 			}
 
