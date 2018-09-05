@@ -89,23 +89,23 @@ export function createValue( element, multiline, settings ) {
 /**
  * Creates rich text value and selection objects from a DOM element and range.
  *
- * @param {HTMLElement} element                 Element to create value object
- *                                              from.
- * @param {Range}       range                   Range to create selection object
- *                                              from.
- * @param {Object}    $3                      Settings.
- * @param {Function}    $3.removeNodeMatch      Function to declare whether the
- *                                              given node should be removed.
- * @param {Function}    $3.unwrapNodeMatch      Function to declare whether the
- *                                              given node should be unwrapped.
- * @param {Function}    $3.filterString         Function to filter the given
- *                                              string.
- * @param {Function}    $3.removeAttributeMatch Wether to remove an attribute
- *                                              based on the name.
+ * @param {HTMLElement} element                  Element to create value object
+ *                                               from.
+ * @param {Range}       range                    Range to create selection object
+ *                                               from.
+ * @param {Object}      settings                 Settings object.
+ * @param {Function}    settings.removeNodeMatch Function to declare whether the
+ *                                               given node should be removed.
+ * @param {Function}    settings.unwrapNodeMatch Function to declare whether the
+ *                                               given node should be unwrapped.
+ * @param {Function}    settings.filterString    Function to filter the given
+ *                                               string.
+ * @param {Function}    settings.removeAttribute Match Wether to remove an attribute
+ *                                               based on the name.
  *
  * @return {Object} A rich text record.
  */
-function createRecord( element, range, $3 = {} ) {
+function createRecord( element, range, settings = {} ) {
 	if ( ! element ) {
 		return {
 			value: {
@@ -121,7 +121,7 @@ function createRecord( element, range, $3 = {} ) {
 		unwrapNodeMatch = () => false,
 		filterString = ( string ) => string,
 		removeAttributeMatch,
-	} = $3;
+	} = settings;
 
 	const filterStringComplete = ( string ) => filterString( string.replace( '\n', '' ) );
 
@@ -196,7 +196,7 @@ function createRecord( element, range, $3 = {} ) {
 				format = attributes ? { type, attributes } : { type };
 			}
 
-			const { value, selection } = createRecord( node, range, $3 );
+			const { value, selection } = createRecord( node, range, settings );
 			const text = value.text;
 			const start = accumulator.value.text.length;
 
