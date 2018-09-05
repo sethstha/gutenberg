@@ -37,7 +37,7 @@ function createPathToNode( node, rootNode, path ) {
  * @param {HTMLElement} node Root node to find the wanted node in.
  * @param {Array}       path Path (indices) to the wanted node.
  *
- * @return {Object} Object with the found node and the remaining offset if any.
+ * @return {Object} Object with the found node and the remaining offset (if any).
  */
 function getNodeByPath( node, path ) {
 	path = [ ...path ];
@@ -53,8 +53,8 @@ function getNodeByPath( node, path ) {
 }
 
 export function recordToDom( { value, selection = {} }, tag ) {
-	const doc = document.implementation.createHTMLDocument( '' );
-	let { body } = doc;
+	const htmlDocument = document.implementation.createHTMLDocument( '' );
+	let { body } = htmlDocument;
 	let startPath = [];
 	let endPath = [];
 
@@ -62,10 +62,10 @@ export function recordToDom( { value, selection = {} }, tag ) {
 	const { start, end } = selection;
 
 	if ( tag ) {
-		body = body.appendChild( doc.createElement( tag ) );
+		body = body.appendChild( htmlDocument.createElement( tag ) );
 	}
 
-	body.appendChild( doc.createTextNode( '' ) );
+	body.appendChild( htmlDocument.createTextNode( '' ) );
 
 	for ( let i = 0, max = text.length + 1; i < max; i++ ) {
 		const character = text.charAt( i );
@@ -79,7 +79,7 @@ export function recordToDom( { value, selection = {} }, tag ) {
 					return;
 				}
 
-				const newNode = doc.createElement( type );
+				const newNode = htmlDocument.createElement( type );
 				const parentNode = pointer.parentNode;
 
 				for ( const key in attributes ) {
@@ -92,17 +92,17 @@ export function recordToDom( { value, selection = {} }, tag ) {
 					pointer.parentNode.removeChild( pointer );
 				}
 
-				pointer = ( object ? parentNode : newNode ).appendChild( doc.createTextNode( '' ) );
+				pointer = ( object ? parentNode : newNode ).appendChild( htmlDocument.createTextNode( '' ) );
 			} );
 		}
 
 		if ( character ) {
 			if ( character === '\n' ) {
-				pointer = pointer.parentNode.appendChild( doc.createElement( 'br' ) );
+				pointer = pointer.parentNode.appendChild( htmlDocument.createElement( 'br' ) );
 			} else if ( pointer.nodeType === TEXT_NODE ) {
 				pointer.appendData( character );
 			} else {
-				pointer = pointer.parentNode.appendChild( doc.createTextNode( character ) );
+				pointer = pointer.parentNode.appendChild( htmlDocument.createTextNode( character ) );
 			}
 		}
 
@@ -124,8 +124,8 @@ export function recordToDom( { value, selection = {} }, tag ) {
 }
 
 export function multilineRecordToDom( { value, selection }, tag ) {
-	const doc = document.implementation.createHTMLDocument( '' );
-	const { body } = doc;
+	const htmlDocument = document.implementation.createHTMLDocument( '' );
+	const { body } = htmlDocument;
 	let startPath = [];
 	let endPath = [];
 
@@ -206,7 +206,7 @@ export function applySelection( selection, current ) {
 	const { node: startContainer, offset: startOffset } = getNodeByPath( current, selection.startPath );
 	const { node: endContainer, offset: endOffset } = getNodeByPath( current, selection.endPath );
 
-	const sel = window.getSelection();
+	const windowSelection = window.getSelection();
 	const range = current.ownerDocument.createRange();
 	const collapsed = startContainer === endContainer && startOffset === endOffset;
 
@@ -234,6 +234,6 @@ export function applySelection( selection, current ) {
 		range.setEnd( endContainer, endOffset );
 	}
 
-	sel.removeAllRanges();
-	sel.addRange( range );
+	windowSelection.removeAllRanges();
+	windowSelection.addRange( range );
 }
