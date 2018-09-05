@@ -260,9 +260,10 @@ function createRecord( element, range, settings = {} ) {
 /**
  * Gets the attributes of an element in object shape.
  *
- * @param {HTMLElement} element                 Element to get attributes from.
- * @param {Function}    $2.removeAttributeMatch Wether to remove an attribute
- *                                              based on the name.
+ * @param {HTMLElement} element                       Element to get attributes from.
+ * @param {Function}    settings.removeAttributeMatch Function whose return value
+ *                                                    determines whether or not to
+ *                                                    remove an attribute based on name.
  *
  * @return {?Object} Attribute object or `undefined` if the element has no
  *                   attributes.
@@ -274,12 +275,12 @@ function getAttributes( element, {
 		return;
 	}
 
-	return Array.from( element.attributes ).reduce( ( acc, { name, value } ) => {
+	return Array.from( element.attributes ).reduce( ( accumulator, { name, value } ) => {
 		if ( ! removeAttributeMatch( name ) ) {
-			acc = acc || {};
-			acc[ name ] = value;
+			accumulator = accumulator || {};
+			accumulator[ name ] = value;
 		}
 
-		return acc;
+		return accumulator;
 	}, undefined );
 }
