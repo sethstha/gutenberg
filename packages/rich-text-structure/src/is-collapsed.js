@@ -1,5 +1,5 @@
 /**
- * Check wether or not the selection of a rich text record is collapsed.
+ * Check if the selection of a rich text record is collapsed.
  *
  * @param {Object} record The rich text record to check.
  *
