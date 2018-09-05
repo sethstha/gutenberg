@@ -68,7 +68,7 @@ export default function() {
 
 			const text = getTextContent( record );
 
-			if ( text.indexOf( '`' ) === -1 ) {
+			if ( text.includes( '`' ) ) {
 				return record;
 			}
 
