@@ -169,7 +169,10 @@ export function apply( record, current, multiline ) {
 	const { body, selection } = toDom( record, multiline );
 
 	applyValue( body, current );
-	applySelection( selection, current );
+
+	if ( record.selection ) {
+		applySelection( selection, current );
+	}
 }
 
 export function applyValue( future, current ) {
