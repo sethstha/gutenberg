@@ -5,42 +5,17 @@
 import { removeFormat } from '../remove-format';
 
 describe( 'removeFormat', () => {
+	const strong = { type: 'strong' };
+	const em = { type: 'em' };
+
 	it( 'should remove format', () => {
 		const record = {
-			formats: [
-				undefined,
-				undefined,
-				undefined,
-				[ { type: 'strong' } ],
-				[ { type: 'em' }, { type: 'strong' } ],
-				[ { type: 'em' }, { type: 'strong' } ],
-				[ { type: 'em' } ],
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-			],
+			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
 
 		const expected = {
-			formats: [
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-			],
+			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
 
@@ -51,38 +26,19 @@ describe( 'removeFormat', () => {
 		const record = {
 			value: [
 				{
-					formats: [
-						undefined,
-						undefined,
-						[ { type: 'em' } ],
-					],
+					formats: [ , , [ em ] ],
 					text: 'one',
 				},
 				{
-					formats: [
-						[ { type: 'em' } ],
-						[ { type: 'em' } ],
-						[ { type: 'em' } ],
-					],
+					formats: [ [ em ], [ em ], [ em ] ],
 					text: 'two',
 				},
 				{
-					formats: [
-						[ { type: 'em' } ],
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ [ em ], , , , , ],
 					text: 'three',
 				},
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , , ],
 					text: 'four',
 				},
 			],
@@ -95,38 +51,19 @@ describe( 'removeFormat', () => {
 		const expected = {
 			value: [
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , ],
 					text: 'one',
 				},
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , ],
 					text: 'two',
 				},
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , , , ],
 					text: 'three',
 				},
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , , ],
 					text: 'four',
 				},
 			],
@@ -141,40 +78,12 @@ describe( 'removeFormat', () => {
 
 	it( 'should remove format for collased selection', () => {
 		const record = {
-			formats: [
-				undefined,
-				undefined,
-				undefined,
-				[ { type: 'strong' } ],
-				[ { type: 'em' }, { type: 'strong' } ],
-				[ { type: 'em' }, { type: 'strong' } ],
-				[ { type: 'em' } ],
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-			],
+			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
 
 		const expected = {
-			formats: [
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-			],
+			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
 

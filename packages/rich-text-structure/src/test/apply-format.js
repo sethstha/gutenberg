@@ -5,66 +5,27 @@
 import { applyFormat } from '../apply-format';
 
 describe( 'applyFormat', () => {
+	const strong = { type: 'strong' };
+	const em = { type: 'em' };
+
 	it( 'should apply format', () => {
 		const record = {
-			formats: [
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-			],
+			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
 
 		const expected = {
-			formats: [
-				undefined,
-				undefined,
-				undefined,
-				[ { type: 'strong' } ],
-				[ { type: 'em' }, { type: 'strong' } ],
-				[ { type: 'em' }, { type: 'strong' } ],
-				[ { type: 'em' } ],
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-			],
+			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
 
-		expect( applyFormat( record, { type: 'strong' }, 3, 6 ) ).toEqual( expected );
+		expect( applyFormat( record, strong, 3, 6 ) ).toEqual( expected );
 	} );
 
 	it( 'should apply format by selection', () => {
 		const record = {
 			value: {
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 				text: 'one two three',
 			},
 			selection: {
@@ -75,21 +36,7 @@ describe( 'applyFormat', () => {
 
 		const expected = {
 			value: {
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					[ { type: 'strong' } ],
-					[ { type: 'em' }, { type: 'strong' } ],
-					[ { type: 'em' }, { type: 'strong' } ],
-					[ { type: 'em' } ],
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
 				text: 'one two three',
 			},
 			selection: {
@@ -98,45 +45,26 @@ describe( 'applyFormat', () => {
 			},
 		};
 
-		expect( applyFormat( record, { type: 'strong' } ) ).toEqual( expected );
+		expect( applyFormat( record, strong ) ).toEqual( expected );
 	} );
 
 	it( 'should apply format for multiline', () => {
 		const record = {
 			value: [
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , ],
 					text: 'one',
 				},
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , ],
 					text: 'two',
 				},
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , , , ],
 					text: 'three',
 				},
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , , ],
 					text: 'four',
 				},
 			],
@@ -149,38 +77,19 @@ describe( 'applyFormat', () => {
 		const expected = {
 			value: [
 				{
-					formats: [
-						undefined,
-						undefined,
-						[ { type: 'em' } ],
-					],
+					formats: [ , , [ em ] ],
 					text: 'one',
 				},
 				{
-					formats: [
-						[ { type: 'em' } ],
-						[ { type: 'em' } ],
-						[ { type: 'em' } ],
-					],
+					formats: [ [ em ], [ em ], [ em ] ],
 					text: 'two',
 				},
 				{
-					formats: [
-						[ { type: 'em' } ],
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ [ em ], , , , , ],
 					text: 'three',
 				},
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , , ],
 					text: 'four',
 				},
 			],
@@ -190,6 +99,6 @@ describe( 'applyFormat', () => {
 			},
 		};
 
-		expect( applyFormat( record, { type: 'em' } ) ).toEqual( expected );
+		expect( applyFormat( record, em ) ).toEqual( expected );
 	} );
 } );

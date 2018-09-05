@@ -5,14 +5,12 @@
 import { getActiveFormat } from '../get-active-format';
 
 describe( 'getActiveFormat', () => {
+	const em = { type: 'em' };
+
 	it( 'should get format by selection', () => {
 		const record = {
 			value: {
-				formats: [
-					[ { type: 'em' } ],
-					undefined,
-					undefined,
-				],
+				formats: [ [ em ], , , ],
 				text: 'one',
 			},
 			selection: {
@@ -21,19 +19,13 @@ describe( 'getActiveFormat', () => {
 			},
 		};
 
-		const expected = { type: 'em' };
-
-		expect( getActiveFormat( record, 'em' ) ).toEqual( expected );
+		expect( getActiveFormat( record, 'em' ) ).toEqual( em );
 	} );
 
 	it( 'should get format by selection using the start', () => {
 		const record = {
 			value: {
-				formats: [
-					[ { type: 'em' } ],
-					undefined,
-					[ { type: 'em' } ],
-				],
+				formats: [ [ em ], , [ em ] ],
 				text: 'one',
 			},
 			selection: {
@@ -48,21 +40,7 @@ describe( 'getActiveFormat', () => {
 	it( 'should get format by selection for multiline', () => {
 		const record = {
 			value: [ {
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 				text: 'one two three',
 			} ],
 			selection: {
@@ -71,8 +49,6 @@ describe( 'getActiveFormat', () => {
 			},
 		};
 
-		const expected = { type: 'em' };
-
-		expect( getActiveFormat( record, 'em' ) ).toEqual( expected );
+		expect( getActiveFormat( record, 'em' ) ).toEqual( em );
 	} );
 } );

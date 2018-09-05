@@ -48,9 +48,14 @@ export function removeFormat(
 	};
 }
 
-function filterFormats( formatsAtIndex, formatType ) {
-	const newFormats = formatsAtIndex.filter( ( { type } ) => type !== formatType );
-	return newFormats.length ? newFormats : undefined;
+function filterFormats( formats, index, formatType ) {
+	const newFormats = formats[ index ].filter( ( { type } ) => type !== formatType );
+
+	if ( newFormats.length ) {
+		formats[ index ] = newFormats;
+	} else {
+		formats[ index ] = undefined;
+	}
 }
 
 export function removeFormatFromValue(
@@ -65,20 +70,20 @@ export function removeFormatFromValue(
 		const format = find( formats[ start ], { type: formatType } );
 
 		while ( find( formats[ start ], format ) ) {
-			formats[ start ] = filterFormats( formats[ start ], formatType );
+			filterFormats( formats, start, formatType );
 			start--;
 		}
 
 		end++;
 
 		while ( find( formats[ end ], format ) ) {
-			formats[ end ] = filterFormats( formats[ end ], formatType );
+			filterFormats( formats, end, formatType );
 			end++;
 		}
 	} else {
 		for ( let i = start; i < end; i++ ) {
 			if ( formats[ i ] ) {
-				formats[ i ] = filterFormats( formats[ i ], formatType );
+				filterFormats( formats, i, formatType );
 			}
 		}
 	}

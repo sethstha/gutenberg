@@ -5,24 +5,13 @@
 import { splice } from '../splice';
 
 describe( 'splice', () => {
+	const em = { type: 'em' };
+	const strong = { type: 'strong' };
+
 	it( 'should delete and insert', () => {
 		const record = {
 			value: {
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 				text: 'one two three',
 			},
 			selection: {
@@ -33,18 +22,7 @@ describe( 'splice', () => {
 
 		const expected = {
 			value: {
-				formats: [
-					undefined,
-					undefined,
-					[ { type: 'strong' } ],
-					[ { type: 'em' } ],
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , [ strong ], [ em ], , , , , , , ],
 				text: 'onao three',
 			},
 			selection: {
@@ -53,16 +31,13 @@ describe( 'splice', () => {
 			},
 		};
 
-		expect( splice( record, 2, 4, 'a', [ [ { type: 'strong' } ] ] ) ).toEqual( expected );
+		expect( splice( record, 2, 4, 'a', [ [ strong ] ] ) ).toEqual( expected );
 	} );
 
 	it( 'should insert line break with selection', () => {
 		const record = {
 			value: {
-				formats: [
-					undefined,
-					undefined,
-				],
+				formats: [ , , ],
 				text: 'tt',
 			},
 			selection: {
@@ -73,11 +48,7 @@ describe( 'splice', () => {
 
 		const expected = {
 			value: {
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , ],
 				text: 't\nt',
 			},
 			selection: {
@@ -88,59 +59,4 @@ describe( 'splice', () => {
 
 		expect( splice( record, undefined, 0, '\n' ) ).toEqual( expected );
 	} );
-
-	// it( 'should delete and insert multiline', () => {
-	// 	const record = {
-	// 		value: [
-	// 			{
-	// 				formats: [
-	// 					undefined,
-	// 					undefined,
-	// 					undefined,
-	// 					undefined,
-	// 					[ { type: 'em' } ],
-	// 					[ { type: 'em' } ],
-	// 					[ { type: 'em' } ],
-	// 					undefined,
-	// 					undefined,
-	// 					undefined,
-	// 					undefined,
-	// 					undefined,
-	// 					undefined,
-	// 				],
-	// 				text: 'one two three',
-	// 			}
-	// 		],
-	// 		selection: {
-	// 			start: [ 0, 6 ],
-	// 			end: [ 0, 6 ],
-	// 		},
-	// 	};
-
-	// 	const expected = {
-	// 		value: [
-	// 			{
-	// 				formats: [
-	// 					undefined,
-	// 					undefined,
-	// 					[ { type: 'strong' } ],
-	// 					[ { type: 'em' } ],
-	// 					undefined,
-	// 					undefined,
-	// 					undefined,
-	// 					undefined,
-	// 					undefined,
-	// 					undefined,
-	// 				],
-	// 				text: 'onao three',
-	// 			}
-	// 		],
-	// 		selection: {
-	// 			start: [ 0, 3 ],
-	// 			end: [ 0, 3 ],
-	// 		},
-	// 	};
-
-	// 	expect( splice( record, [ 0, 2 ], [ 0, 4 ], 'a', [ [ { type: 'strong' } ] ] ) ).toEqual( expected );
-	// } );
 } );

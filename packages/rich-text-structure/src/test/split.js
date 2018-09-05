@@ -5,48 +5,21 @@
 import { split } from '../split';
 
 describe( 'split', () => {
+	const em = { type: 'em' };
+
 	it( 'should split', () => {
 		const record = {
-			formats: [
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-			],
+			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
 
 		const expected = [
 			{
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-				],
+				formats: [ , , , , [ em ], [ em ] ],
 				text: 'one tw',
 			},
 			{
-				formats: [
-					[ { type: 'em' } ],
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ [ em ], , , , , , , ],
 				text: 'o three',
 			},
 		];
@@ -57,21 +30,7 @@ describe( 'split', () => {
 	it( 'should split with selection', () => {
 		const record = {
 			value: {
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 				text: 'one two three',
 			},
 			selection: {
@@ -83,29 +42,14 @@ describe( 'split', () => {
 		const expected = [
 			{
 				value: {
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-						[ { type: 'em' } ],
-						[ { type: 'em' } ],
-					],
+					formats: [ , , , , [ em ], [ em ] ],
 					text: 'one tw',
 				},
 				selection: {},
 			},
 			{
 				value: {
-					formats: [
-						[ { type: 'em' } ],
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ [ em ], , , , , , , ],
 					text: 'o three',
 				},
 				selection: {
@@ -131,54 +75,24 @@ describe( 'split', () => {
 
 		expect( split( record, 6, 6 ) ).toEqual( expected );
 	} );
-} );
 
-describe( 'splitSearch', () => {
 	it( 'should split search', () => {
 		const record = {
-			formats: [
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-				undefined,
-			],
+			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 			text: 'one two three',
 		};
 
 		const expected = [
 			{
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , ],
 				text: 'one',
 			},
 			{
-				formats: [
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-				],
+				formats: [ [ em ], [ em ], [ em ] ],
 				text: 'two',
 			},
 			{
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , , , ],
 				text: 'three',
 			},
 		];

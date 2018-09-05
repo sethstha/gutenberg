@@ -5,32 +5,19 @@
 import { concat } from '../concat';
 
 describe( 'concat', () => {
+	const em = { type: 'em' };
+
 	it( 'should merge records', () => {
 		const one = {
-			formats: [
-				undefined,
-				undefined,
-				[ { type: 'em' } ],
-			],
+			formats: [ , , [ em ] ],
 			text: 'one',
 		};
 		const two = {
-			formats: [
-				[ { type: 'em' } ],
-				undefined,
-				undefined,
-			],
+			formats: [ [ em ], , , ],
 			text: 'two',
 		};
 		const three = {
-			formats: [
-				undefined,
-				undefined,
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				undefined,
-				undefined,
-			],
+			formats: [ , , [ em ], [ em ], , , ],
 			text: 'onetwo',
 		};
 
@@ -42,19 +29,11 @@ describe( 'concat', () => {
 
 	it( 'should merge multiline records', () => {
 		const one = [ {
-			formats: [
-				undefined,
-				undefined,
-				[ { type: 'em' } ],
-			],
+			formats: [ , , [ em ] ],
 			text: 'one',
 		} ];
 		const two = [ {
-			formats: [
-				undefined,
-				undefined,
-				[ { type: 'em' } ],
-			],
+			formats: [ , , [ em ] ],
 			text: 'two',
 		} ];
 

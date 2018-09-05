@@ -5,24 +5,12 @@
 import { getTextContent } from '../get-text-content';
 
 describe( 'getTextContent', () => {
+	const em = { type: 'em' };
+
 	it( 'should get text content for multiline record', () => {
 		const record = {
 			value: [ {
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 				text: 'one two three',
 			} ],
 			selection: {
