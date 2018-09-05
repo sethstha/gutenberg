@@ -1,3 +1,9 @@
+/**
+ * External dependencies
+ */
+
+import { find } from 'lodash';
+
 export function removeFormat(
 	{ value, selection = {} },
 	formatType,
@@ -42,16 +48,38 @@ export function removeFormat(
 	};
 }
 
+function filterFormats( formatsAtIndex, formatType ) {
+	const newFormats = formatsAtIndex.filter( ( { type } ) => type !== formatType );
+	return newFormats.length ? newFormats : undefined;
+}
+
 export function removeFormatFromValue(
 	{ formats, text },
 	formatType,
 	start,
 	end
 ) {
-	for ( let i = start; i < end; i++ ) {
-		if ( formats[ i ] ) {
-			const newFormats = formats[ i ].filter( ( { type } ) => type !== formatType );
-			formats[ i ] = newFormats.length ? newFormats : undefined;
+	// If the selection is collapsed, expand start and end to the edges of the
+	// format.
+	if ( start === end ) {
+		const format = find( formats[ start ], { type: formatType } );
+
+		while ( find( formats[ start ], format ) ) {
+			formats[ start ] = filterFormats( formats[ start ], formatType );
+			start--;
+		}
+
+		end++;
+
+		while ( find( formats[ end ], format ) ) {
+			formats[ end ] = filterFormats( formats[ end ], formatType );
+			end++;
+		}
+	} else {
+		for ( let i = start; i < end; i++ ) {
+			if ( formats[ i ] ) {
+				formats[ i ] = filterFormats( formats[ i ], formatType );
+			}
 		}
 	}
 

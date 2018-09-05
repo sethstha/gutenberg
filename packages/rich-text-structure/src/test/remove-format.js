@@ -138,4 +138,46 @@ describe( 'removeFormat', () => {
 
 		expect( removeFormat( record, 'em' ) ).toEqual( expected );
 	} );
+
+	it( 'should remove format for collased selection', () => {
+		const record = {
+			formats: [
+				undefined,
+				undefined,
+				undefined,
+				[ { type: 'strong' } ],
+				[ { type: 'em' }, { type: 'strong' } ],
+				[ { type: 'em' }, { type: 'strong' } ],
+				[ { type: 'em' } ],
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+			],
+			text: 'one two three',
+		};
+
+		const expected = {
+			formats: [
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				[ { type: 'em' } ],
+				[ { type: 'em' } ],
+				[ { type: 'em' } ],
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+				undefined,
+			],
+			text: 'one two three',
+		};
+
+		expect( removeFormat( record, 'strong', 4, 4 ) ).toEqual( expected );
+	} );
 } );
