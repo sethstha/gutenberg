@@ -32,17 +32,11 @@ describe( 'Links', () => {
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
 
-		// A placeholder link should have been inserted
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).not.toBeNull();
-
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
 		// Click on the Apply button
 		await page.click( 'button[aria-label="Apply"]' );
-
-		// There should no longer be a placeholder link
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).toBeNull();
 
 		// The link should have been inserted
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -59,17 +53,11 @@ describe( 'Links', () => {
 		// Press Cmd+K to insert a link
 		await pressWithModifier( META_KEY, 'K' );
 
-		// A placeholder link should have been inserted
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).not.toBeNull();
-
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
 
 		// Press Enter to apply the link
 		await page.keyboard.press( 'Enter' );
-
-		// There should no longer be a placeholder link
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).toBeNull();
 
 		// The link should have been inserted
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -86,9 +74,6 @@ describe( 'Links', () => {
 		// Trigger isTyping = false
 		await page.mouse.move( 200, 300, { steps: 10 } );
 		await page.mouse.move( 250, 350, { steps: 10 } );
-
-		// A placeholder link should not have been inserted
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).toBeNull();
 
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -114,9 +99,6 @@ describe( 'Links', () => {
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
 
-		// A placeholder link should not have been inserted
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).toBeNull();
-
 		// A link with the selected URL as its href should have been inserted
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -137,9 +119,6 @@ describe( 'Links', () => {
 
 		// Click somewhere else - it doesn't really matter where
 		await page.click( '.editor-post-title' );
-
-		// A placeholder link should not have been inserted
-		expect( await page.$( 'a[data-wp-placeholder]' ) ).toBeNull();
 	} );
 
 	const createAndReselectLink = async () => {

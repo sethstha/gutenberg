@@ -2,6 +2,6 @@
 
 exports[`Formatting Controls Should apply the formatting controls 1`] = `
 "<!-- wp:paragraph -->
-<p>Paragraph to be made <strong>\\"bold\\"</strong></p>
+<p>Paragraph to be made <strong>&quot;bold&quot;</strong></p>
 <!-- /wp:paragraph -->"
 `;
