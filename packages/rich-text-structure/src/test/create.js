@@ -10,6 +10,7 @@ import { JSDOM } from 'jsdom';
 
 import { create, createValue } from '../create';
 import { toString } from '../to-string';
+import { getSparseArrayLength } from './helpers';
 
 const { window } = new JSDOM();
 const { document } = window;
@@ -34,8 +35,9 @@ describe( 'create', () => {
 			endOffset: 0,
 			endContainer: element.querySelector( 'strong' ).firstChild,
 		};
+		const actual = create( element, range );
 
-		expect( create( element, range ) ).toEqual( {
+		expect( actual ).toEqual( {
 			value: {
 				formats: [ , , , ,
 					[ em ],
@@ -58,6 +60,8 @@ describe( 'create', () => {
 				end: 11,
 			},
 		} );
+
+		expect( getSparseArrayLength( actual.value.formats ) ).toBe( 12 );
 	} );
 
 	it( 'should reference formats', () => {
@@ -82,8 +86,9 @@ describe( 'create', () => {
 			endOffset: 0,
 			endContainer: element.lastChild,
 		};
+		const actual = create( element, range, 'p' );
 
-		expect( create( element, range, 'p' ) ).toEqual( {
+		expect( actual ).toEqual( {
 			value: [
 				{
 					formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
@@ -99,10 +104,13 @@ describe( 'create', () => {
 				end: [ 1 ],
 			},
 		} );
+		expect( getSparseArrayLength( actual.value[ 0 ].formats ) ).toBe( 3 );
+		expect( getSparseArrayLength( actual.value[ 1 ].formats ) ).toBe( 0 );
 	} );
 
 	it( 'should extract multiline text list', () => {
 		const element = createNode( '<ul><li>one<ul><li>two</li></ul></li><li>three</li></ul>' );
+		const actual = createValue( element, 'li' );
 
 		expect( createValue( element, 'li' ) ).toEqual( [
 			{
@@ -118,6 +126,8 @@ describe( 'create', () => {
 				text: 'three',
 			},
 		] );
+		expect( getSparseArrayLength( actual[ 0 ].formats ) ).toBe( 3 );
+		expect( getSparseArrayLength( actual[ 1 ].formats ) ).toBe( 0 );
 	} );
 
 	it( 'should skip bogus 1', () => {
@@ -134,8 +144,9 @@ describe( 'create', () => {
 			removeAttributeMatch: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
 			filterString: ( string ) => string.replace( '\uFEFF', '' ),
 		};
+		const actual = create( element, range, false, settings );
 
-		expect( create( element, range, false, settings ) ).toEqual( {
+		expect( actual ).toEqual( {
 			value: {
 				formats: [ [ strong ], [ strong ], [ strong ], [ strong ] ],
 				text: 'test',
@@ -145,6 +156,7 @@ describe( 'create', () => {
 				end: 0,
 			},
 		} );
+		expect( getSparseArrayLength( actual.value.formats ) ).toBe( 4 );
 	} );
 
 	it( 'should skip bogus 2', () => {
@@ -161,6 +173,7 @@ describe( 'create', () => {
 			removeAttributeMatch: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
 			filterString: ( string ) => string.replace( '\uFEFF', '' ),
 		};
+		const actual = create( element, range, false, settings );
 
 		expect( create( element, range, false, settings ) ).toEqual( {
 			value: {
@@ -172,6 +185,7 @@ describe( 'create', () => {
 				end: 5,
 			},
 		} );
+		expect( getSparseArrayLength( actual.value.formats ) ).toBe( 4 );
 	} );
 
 	it( 'should handle br', () => {
@@ -188,8 +202,10 @@ describe( 'create', () => {
 			endOffset: 0,
 			endContainer: element.lastChild,
 		};
+		const actual1 = create( element, range1, false );
+		const actual2 = create( element, range2, false );
 
-		expect( create( element, range1, false ) ).toEqual( {
+		expect( actual1 ).toEqual( {
 			value: {
 				formats: [ , , , , , , , , , ],
 				text: 'test\ntest',
@@ -199,8 +215,8 @@ describe( 'create', () => {
 				end: 4,
 			},
 		} );
-
-		expect( create( element, range2, false ) ).toEqual( {
+		expect( getSparseArrayLength( actual1.value.formats ) ).toBe( 1 );
+		expect( actual2 ).toEqual( {
 			value: {
 				formats: [ , , , , , , , , , ],
 				text: 'test\ntest',
@@ -210,6 +226,7 @@ describe( 'create', () => {
 				end: 5,
 			},
 		} );
+		expect( getSparseArrayLength( actual2.value.formats ) ).toBe( 1 );
 	} );
 } );
 

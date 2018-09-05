@@ -75,7 +75,7 @@ const richTextStructureSettings = {
 	removeNodeMatch: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
 	unwrapNodeMatch: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 	removeAttributeMatch: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
-	filterString: ( string ) => string.replace( '\uFEFF', '' ),
+	filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
 };
 
 export class RichText extends Component {

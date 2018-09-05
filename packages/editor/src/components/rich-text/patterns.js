@@ -47,6 +47,7 @@ export function getPatterns( { onReplace, multiline } ) {
 
 			const text = getTextContent( record );
 
+			// Quick check the text for the necessary character.
 			if ( text.indexOf( '`' ) === -1 ) {
 				return record;
 			}

@@ -65,11 +65,12 @@ export function valueToString( value, multiline ) {
 	}
 
 	const { formats, text } = value;
+	const formatsLength = formats.length + 1;
 	const tree = {};
 
 	append( tree, { text: '' } );
 
-	for ( let i = 0, max = text.length + 1; i < max; i++ ) {
+	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
 		const characterFormats = formats[ i ];
 

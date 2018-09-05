@@ -16,7 +16,22 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
         tagName="span"
         value={
           Object {
-            "formats": Array [],
+            "formats": Array [
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+            ],
             "text": "Heading parent",
           }
         }
@@ -33,7 +48,21 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
         tagName="span"
         value={
           Object {
-            "formats": Array [],
+            "formats": Array [
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+            ],
             "text": "Heading child",
           }
         }
@@ -59,7 +88,17 @@ exports[`DocumentOutline header blocks present should render warnings for multip
         tagName="span"
         value={
           Object {
-            "formats": Array [],
+            "formats": Array [
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+            ],
             "text": "Heading 1",
           }
         }
@@ -84,7 +123,17 @@ exports[`DocumentOutline header blocks present should render warnings for multip
         tagName="span"
         value={
           Object {
-            "formats": Array [],
+            "formats": Array [
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+            ],
             "text": "Heading 1",
           }
         }

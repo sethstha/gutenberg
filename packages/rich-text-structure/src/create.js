@@ -123,6 +123,8 @@ function createRecord( element, range, settings = {} ) {
 		removeAttributeMatch,
 	} = settings;
 
+	// Remove any line breaks in text nodes. They are not content, but used to
+	// format the HTML. Line breaks in HTML are stored as BR elements.
 	const filterStringComplete = ( string ) => filterString( string.replace( '\n', '' ) );
 
 	if (
@@ -132,7 +134,7 @@ function createRecord( element, range, settings = {} ) {
 	) {
 		return {
 			value: {
-				formats: [ undefined ],
+				formats: Array( 1 ),
 				text: '\n',
 			},
 			selection: {},
@@ -165,7 +167,9 @@ function createRecord( element, range, settings = {} ) {
 
 			const text = filterStringComplete( node.nodeValue, accumulator.selection );
 			accumulator.value.text += text;
-			formats.push( ...Array( text.length ) );
+			// Create a sparse array of the same length as `text`, in which
+			// formats can be added.
+			formats.length += text.length;
 		} else if ( node.nodeType === ELEMENT_NODE ) {
 			if ( removeNodeMatch( node ) ) {
 				return accumulator;

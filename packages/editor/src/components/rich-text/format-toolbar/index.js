@@ -37,7 +37,7 @@ const FormatToolbar = ( props ) => {
 			return {
 				...control,
 				onClick: () => props.toggleFormat( { type: control.selector } ),
-				isActive: !! props.getActiveFormat( control.selector ),
+				isActive: props.getActiveFormat( control.selector ) !== undefined,
 			};
 		} );
 

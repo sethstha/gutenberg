@@ -60,6 +60,7 @@ export function recordToDom( { value, selection = {} }, tag ) {
 
 	const { formats, text } = value;
 	const { start, end } = selection;
+	const formatsLength = formats.length + 1;
 
 	if ( tag ) {
 		body = body.appendChild( htmlDocument.createElement( tag ) );
@@ -67,7 +68,7 @@ export function recordToDom( { value, selection = {} }, tag ) {
 
 	body.appendChild( htmlDocument.createTextNode( '' ) );
 
-	for ( let i = 0, max = text.length + 1; i < max; i++ ) {
+	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
 		const nextFormats = formats[ i ] || [];
 		let pointer = body.lastChild;

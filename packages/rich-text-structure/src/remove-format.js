@@ -54,7 +54,7 @@ function filterFormats( formats, index, formatType ) {
 	if ( newFormats.length ) {
 		formats[ index ] = newFormats;
 	} else {
-		formats[ index ] = undefined;
+		delete formats[ index ];
 	}
 }
 
