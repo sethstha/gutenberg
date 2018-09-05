@@ -48,7 +48,7 @@ class LinkContainer extends Component {
 		}
 
 		return {
-			inputValue: link.attributes && link.attributes.href ? null : '',
+			inputValue: link && link.attributes && link.attributes.href ? null : '',
 			opensInNewWindow: null,
 			lastSelection: selection,
 			selectionKey: state.selectionKey + 1,
@@ -141,6 +141,11 @@ class LinkContainer extends Component {
 
 	render() {
 		const { link } = this.props;
+
+		if ( ! link ) {
+			return null;
+		}
+
 		const { inputValue, settingsVisible, opensInNewWindow, selectionKey } = this.state;
 		const linkSettings = settingsVisible && (
 			<div className="editor-format-toolbar__link-modal-line editor-format-toolbar__link-settings">
