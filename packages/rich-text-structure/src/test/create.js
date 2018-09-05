@@ -21,6 +21,11 @@ function createNode( HTML ) {
 }
 
 describe( 'create', () => {
+	const em = { type: 'em' };
+	const strong = { type: 'strong' };
+	const a = { type: 'a', attributes: { href: '#' } };
+	const img = { type: 'img', attributes: { src: '' }, object: true };
+
 	it( 'should extract text with formats', () => {
 		const element = createNode( '<p>one <em>two 🍒</em> <a href="#"><img src=""><strong>three</strong></a><img src=""></p>' );
 		const range = {
@@ -32,24 +37,19 @@ describe( 'create', () => {
 
 		expect( create( element, range ) ).toEqual( {
 			value: {
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					[ { type: 'em' } ],
-					undefined,
-					[ { type: 'a', attributes: { href: '#' } }, { type: 'img', attributes: { src: '' }, object: true }, { type: 'strong' } ],
-					[ { type: 'a', attributes: { href: '#' } }, { type: 'strong' } ],
-					[ { type: 'a', attributes: { href: '#' } }, { type: 'strong' } ],
-					[ { type: 'a', attributes: { href: '#' } }, { type: 'strong' } ],
-					[ { type: 'a', attributes: { href: '#' } }, { type: 'strong' } ],
-					[ { type: 'img', attributes: { src: '' }, object: true } ],
+				formats: [ , , , ,
+					[ em ],
+					[ em ],
+					[ em ],
+					[ em ],
+					[ em ],
+					[ em ], ,
+					[ a, img, strong ],
+					[ a, strong ],
+					[ a, strong ],
+					[ a, strong ],
+					[ a, strong ],
+					[ img ],
 				],
 				text: 'one two 🍒 three',
 			},
@@ -65,12 +65,7 @@ describe( 'create', () => {
 		const value = createValue( element );
 
 		expect( value ).toEqual( {
-			formats: [
-				[ { type: 'em' } ],
-				[ { type: 'em' } ],
-				[ { type: 'em' }, { type: 'strong' } ],
-				[ { type: 'em' }, { type: 'strong' } ],
-			],
+			formats: [ [ em ], [ em ], [ em, strong ], [ em, strong ] ],
 			text: 'test',
 		} );
 
@@ -91,30 +86,11 @@ describe( 'create', () => {
 		expect( create( element, range, 'p' ) ).toEqual( {
 			value: [
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-						[ { type: 'em' } ],
-						[ { type: 'em' } ],
-						[ { type: 'em' } ],
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
 					text: 'one two three',
 				},
 				{
-					formats: [
-						undefined,
-						undefined,
-						undefined,
-						undefined,
-					],
+					formats: [ , , , , ],
 					text: 'test',
 				},
 			],
@@ -130,10 +106,7 @@ describe( 'create', () => {
 
 		expect( createValue( element, 'li' ) ).toEqual( [
 			{
-				formats: [
-					undefined,
-					undefined,
-					undefined,
+				formats: [ , , ,
 					[ { type: 'ul' }, { type: 'li' } ],
 					[ { type: 'ul' }, { type: 'li' } ],
 					[ { type: 'ul' }, { type: 'li' } ],
@@ -141,13 +114,7 @@ describe( 'create', () => {
 				text: 'onetwo',
 			},
 			{
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , , , ],
 				text: 'three',
 			},
 		] );
@@ -170,12 +137,7 @@ describe( 'create', () => {
 
 		expect( create( element, range, false, settings ) ).toEqual( {
 			value: {
-				formats: [
-					[ { type: 'strong' } ],
-					[ { type: 'strong' } ],
-					[ { type: 'strong' } ],
-					[ { type: 'strong' } ],
-				],
+				formats: [ [ strong ], [ strong ], [ strong ], [ strong ] ],
 				text: 'test',
 			},
 			selection: {
@@ -202,17 +164,7 @@ describe( 'create', () => {
 
 		expect( create( element, range, false, settings ) ).toEqual( {
 			value: {
-				formats: [
-					[ { type: 'strong' } ],
-					[ { type: 'strong' } ],
-					[ { type: 'strong' } ],
-					[ { type: 'strong' } ],
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ [ strong ], [ strong ], [ strong ], [ strong ], , , , , , ],
 				text: 'test test',
 			},
 			selection: {
@@ -239,17 +191,7 @@ describe( 'create', () => {
 
 		expect( create( element, range1, false ) ).toEqual( {
 			value: {
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , , , , , , , ],
 				text: 'test\ntest',
 			},
 			selection: {
@@ -260,17 +202,7 @@ describe( 'create', () => {
 
 		expect( create( element, range2, false ) ).toEqual( {
 			value: {
-				formats: [
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-					undefined,
-				],
+				formats: [ , , , , , , , , , ],
 				text: 'test\ntest',
 			},
 			selection: {
