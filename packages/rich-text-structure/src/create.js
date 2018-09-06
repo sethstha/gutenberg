@@ -22,19 +22,19 @@ function createElement( html ) {
 /**
  * Creates rich text value and selection objects from a DOM element and range.
  *
- * @param {HTMLElement} element   Element to create value object from.
- * @param {Range}       range     Range to create selection object from.
- * @param {string}      multiline Multiline tag if the structure is multiline.
- * @param {Object}      settings  Settings passed to `createRecord`.
+ * @param {HTMLElement} element      Element to create value object from.
+ * @param {Range}       range        Range to create selection object from.
+ * @param {string}      multilineTag Multiline tag if the structure is multiline.
+ * @param {Object}      settings     Settings passed to `createRecord`.
  *
  * @return {Object} A rich text record.
  */
-export function create( element, range, multiline, settings ) {
+export function create( element, range, multilineTag, settings ) {
 	if ( typeof element === 'string' ) {
 		element = createElement( element );
 	}
 
-	if ( ! multiline ) {
+	if ( ! multilineTag ) {
 		return createRecord( element, range, settings );
 	}
 
@@ -48,7 +48,7 @@ export function create( element, range, multiline, settings ) {
 	}
 
 	return Array.from( element.childNodes ).reduce( ( accumlator, child, index ) => {
-		if ( child.nodeName.toLowerCase() === multiline ) {
+		if ( child.nodeName.toLowerCase() === multilineTag ) {
 			const { selection, value } = createRecord( child, range, settings );
 
 			if ( range ) {
@@ -75,14 +75,14 @@ export function create( element, range, multiline, settings ) {
 /**
  * Creates a rich text value object from a DOM element.
  *
- * @param {HTMLElement} element   Element to create value object from.
- * @param {string}      multiline Multiline tag.
- * @param {Object}      settings  Settings passed to `createRecord`.
+ * @param {HTMLElement} element      Element to create value object from.
+ * @param {string}      multilineTag Multiline tag.
+ * @param {Object}      settings     Settings passed to `createRecord`.
  *
  * @return {Object} A rich text value object.
  */
-export function createValue( element, multiline, settings ) {
-	return create( element, null, multiline, settings ).value;
+export function createValue( element, multilineTag, settings ) {
+	return create( element, null, multilineTag, settings ).value;
 }
 
 /**
@@ -129,8 +129,6 @@ function createRecord( element, range, settings = {} ) {
 	const filterStringComplete = ( string ) => filterString( string.replace( '\n', '' ) );
 
 	return Array.from( element.childNodes ).reduce( ( accumulator, node ) => {
-		const { formats } = accumulator.value;
-
 		if ( node.nodeType === TEXT_NODE ) {
 			const nodeValue = node.nodeValue;
 			const text = filterStringComplete( nodeValue );
@@ -154,91 +152,93 @@ function createRecord( element, range, settings = {} ) {
 			accumulator.value.text += text;
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
-			formats.length += text.length;
-		} else if ( node.nodeType === ELEMENT_NODE ) {
-			if ( removeNodeMatch( node ) ) {
+			accumulator.value.formats.length += text.length;
+			return accumulator;
+		}
+
+		if ( node.nodeType !== ELEMENT_NODE || removeNodeMatch( node ) ) {
+			return accumulator;
+		}
+
+		if ( range ) {
+			if (
+				node.parentNode === range.startContainer &&
+				node === range.startContainer.childNodes[ range.startOffset ]
+			) {
+				accumulator.selection.start = accumulator.value.text.length;
+			}
+
+			if (
+				node.parentNode === range.endContainer &&
+				node === range.endContainer.childNodes[ range.endOffset ]
+			) {
+				accumulator.selection.end = accumulator.value.text.length;
+			}
+		}
+
+		if ( node.nodeName === 'BR' ) {
+			if ( unwrapNodeMatch( node ) ) {
 				return accumulator;
 			}
 
-			if ( range ) {
-				if (
-					node.parentNode === range.startContainer &&
-					node === range.startContainer.childNodes[ range.startOffset ]
-				) {
-					accumulator.selection.start = accumulator.value.text.length;
-				}
+			accumulator.value.text += '\n';
+			accumulator.value.formats.length += 1;
+			return accumulator;
+		}
 
-				if (
-					node.parentNode === range.endContainer &&
-					node === range.endContainer.childNodes[ range.endOffset ]
-				) {
-					accumulator.selection.end = accumulator.value.text.length;
-				}
-			}
+		let format;
 
-			if ( node.nodeName === 'BR' ) {
-				if ( unwrapNodeMatch( node ) ) {
-					return accumulator;
-				}
+		if ( ! unwrapNodeMatch( node ) ) {
+			const type = node.nodeName.toLowerCase();
+			const attributes = getAttributes( node, { removeAttributeMatch } );
+			format = attributes ? { type, attributes } : { type };
+		}
 
-				accumulator.value.text += '\n';
-				formats.length += 1;
-				return accumulator;
-			}
+		const { value, selection } = createRecord( node, range, settings );
+		const { formats } = accumulator.value;
+		const text = value.text;
+		const start = accumulator.value.text.length;
 
-			let format;
+		if ( format && text.length === 0 ) {
+			format.object = true;
 
-			if ( ! unwrapNodeMatch( node ) ) {
-				const type = node.nodeName.toLowerCase();
-				const attributes = getAttributes( node, { removeAttributeMatch } );
-				format = attributes ? { type, attributes } : { type };
-			}
-
-			const { value, selection } = createRecord( node, range, settings );
-			const text = value.text;
-			const start = accumulator.value.text.length;
-
-			if ( format && text.length === 0 ) {
-				format.object = true;
-
-				if ( formats[ start ] ) {
-					formats[ start ].unshift( format );
-				} else {
-					formats[ start ] = [ format ];
-				}
+			if ( formats[ start ] ) {
+				formats[ start ].unshift( format );
 			} else {
-				accumulator.value.text += text;
+				formats[ start ] = [ format ];
+			}
+		} else {
+			accumulator.value.text += text;
 
-				let i = value.formats.length;
+			let i = value.formats.length;
 
-				while ( i-- ) {
-					const index = start + i;
+			while ( i-- ) {
+				const index = start + i;
 
-					if ( format ) {
-						if ( formats[ index ] ) {
-							formats[ index ].push( format );
-						} else {
-							formats[ index ] = [ format ];
-						}
+				if ( format ) {
+					if ( formats[ index ] ) {
+						formats[ index ].push( format );
+					} else {
+						formats[ index ] = [ format ];
 					}
+				}
 
-					if ( value.formats[ i ] ) {
-						if ( formats[ index ] ) {
-							formats[ index ].push( ...value.formats[ i ] );
-						} else {
-							formats[ index ] = value.formats[ i ];
-						}
+				if ( value.formats[ i ] ) {
+					if ( formats[ index ] ) {
+						formats[ index ].push( ...value.formats[ i ] );
+					} else {
+						formats[ index ] = value.formats[ i ];
 					}
 				}
 			}
+		}
 
-			if ( selection.start !== undefined ) {
-				accumulator.selection.start = start + selection.start;
-			}
+		if ( selection.start !== undefined ) {
+			accumulator.selection.start = start + selection.start;
+		}
 
-			if ( selection.end !== undefined ) {
-				accumulator.selection.end = start + selection.end;
-			}
+		if ( selection.end !== undefined ) {
+			accumulator.selection.end = start + selection.end;
 		}
 
 		return accumulator;

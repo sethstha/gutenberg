@@ -159,15 +159,15 @@ export function multilineRecordToDom( { value, selection }, tag ) {
  * Applies the given element tree and selection to the live DOM (very basic diff
  * for now).
  *
- * @param {Object}      record    Record to apply.
- * @param {HTMLElement} current   The live root node to apply the element tree
- *                                to.
- * @param {string}      multiline Multiline tag.
+ * @param {Object}      record       Record to apply.
+ * @param {HTMLElement} current      The live root node to apply the element
+ *                                   tree to.
+ * @param {string}      multilineTag Multiline tag.
  */
-export function apply( record, current, multiline ) {
+export function apply( record, current, multilineTag ) {
 	// Construct a new element tree in memory
-	const toDom = multiline ? multilineRecordToDom : recordToDom;
-	const { body, selection } = toDom( record, multiline );
+	const toDom = multilineTag ? multilineRecordToDom : recordToDom;
+	const { body, selection } = toDom( record, multilineTag );
 
 	applyValue( body, current );
 

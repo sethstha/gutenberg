@@ -6,7 +6,7 @@
  *
  * @return {string} HTML string.
  */
-export function toString( { value }, multiline ) {
+export function toHTMLString( { value }, multiline ) {
 	if ( value === undefined ) {
 		return valueToString( ...arguments );
 	}

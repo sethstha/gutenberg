@@ -9,7 +9,7 @@ import { JSDOM } from 'jsdom';
  */
 
 import { create, createValue } from '../create';
-import { toString } from '../to-string';
+import { toHTMLString } from '../to-html-string';
 import { getSparseArrayLength } from './helpers';
 
 const { window } = new JSDOM();
@@ -241,30 +241,30 @@ describe( 'create with settings', () => {
 	it( 'should skip bogus 1', () => {
 		const HTML = '<br data-mce-bogus="true">';
 
-		expect( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
+		expect( toHTMLString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
 	} );
 
 	it( 'should skip bogus 2', () => {
 		const HTML = '<strong data-mce-bogus="true"></strong>';
 
-		expect( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
+		expect( toHTMLString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
 	} );
 
 	it( 'should skip bogus 3', () => {
 		const HTML = '<strong data-mce-bogus="true">test <em>test</em></strong>';
 
-		expect( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( 'test <em>test</em>' );
+		expect( toHTMLString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( 'test <em>test</em>' );
 	} );
 
 	it( 'should skip bogus 4', () => {
 		const HTML = '<strong data-mce-bogus="all">test</strong>';
 
-		expect( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
+		expect( toHTMLString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
 	} );
 
 	it( 'should skip bogus 5', () => {
 		const HTML = '<strong data-mce-selected="inline-boundary">test&#65279;</strong>';
 
-		expect( toString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '<strong>test</strong>' );
+		expect( toHTMLString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '<strong>test</strong>' );
 	} );
 } );

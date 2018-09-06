@@ -10,7 +10,7 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { toString } from '@wordpress/rich-text-structure';
+import { toHTMLString } from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
@@ -189,7 +189,7 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, onPaste, multiline } = this.props;
+		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, onPaste, multilineTag } = this.props;
 		const ariaProps = pickAriaProps( this.props );
 
 		/*
@@ -214,7 +214,7 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: toString( defaultValue, multiline ) },
+			dangerouslySetInnerHTML: { __html: toHTMLString( defaultValue, multilineTag ) },
 			onPaste,
 		} );
 	}

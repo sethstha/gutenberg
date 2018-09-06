@@ -25,12 +25,14 @@ const FormatToolbar = ( props ) => {
 		.filter( ( control ) => props.enabledControls.indexOf( control.format ) !== -1 )
 		.map( ( control ) => {
 			if ( control.format === 'link' ) {
+				const linkIsActive = link !== undefined;
+
 				return {
 					...control,
-					icon: link ? 'editor-unlink' : 'admin-links', // TODO: Need proper unlink icon
-					title: link ? __( 'Unlink' ) : __( 'Link' ),
-					onClick: link ? removeLink : addLink,
-					isActive: !! link,
+					icon: linkIsActive ? 'editor-unlink' : 'admin-links', // TODO: Need proper unlink icon
+					title: linkIsActive ? __( 'Unlink' ) : __( 'Link' ),
+					onClick: linkIsActive ? removeLink : addLink,
+					isActive: linkIsActive,
 				};
 			}
 

@@ -6,7 +6,7 @@ import { find } from 'lodash';
 
 export function getActiveFormat( { value, selection }, formatType ) {
 	if ( ! selection || selection.start === undefined ) {
-		return false;
+		return;
 	}
 
 	if ( Array.isArray( value ) ) {

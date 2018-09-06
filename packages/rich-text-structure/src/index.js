@@ -10,4 +10,4 @@ export { removeFormat } from './remove-format';
 export { splice } from './splice';
 export { split } from './split';
 export { apply } from './to-dom';
-export { toString } from './to-string';
+export { toHTMLString } from './to-html-string';
