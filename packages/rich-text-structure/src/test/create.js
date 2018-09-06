@@ -215,7 +215,7 @@ describe( 'create', () => {
 				end: 4,
 			},
 		} );
-		expect( getSparseArrayLength( actual1.value.formats ) ).toBe( 1 );
+		expect( getSparseArrayLength( actual1.value.formats ) ).toBe( 0 );
 		expect( actual2 ).toEqual( {
 			value: {
 				formats: [ , , , , , , , , , ],
@@ -226,7 +226,7 @@ describe( 'create', () => {
 				end: 5,
 			},
 		} );
-		expect( getSparseArrayLength( actual2.value.formats ) ).toBe( 1 );
+		expect( getSparseArrayLength( actual2.value.formats ) ).toBe( 0 );
 	} );
 } );
 

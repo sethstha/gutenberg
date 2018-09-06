@@ -38,11 +38,13 @@ export function create( element, range, multiline, settings ) {
 		return createRecord( element, range, settings );
 	}
 
+	const emptyRecord = {
+		value: [],
+		selection: {},
+	};
+
 	if ( ! element || ! element.hasChildNodes() ) {
-		return {
-			value: [],
-			selection: {},
-		};
+		return emptyRecord;
 	}
 
 	return Array.from( element.childNodes ).reduce( ( accumlator, child, index ) => {
@@ -67,10 +69,7 @@ export function create( element, range, multiline, settings ) {
 		}
 
 		return accumlator;
-	}, {
-		value: [],
-		selection: {},
-	} );
+	}, emptyRecord );
 }
 
 /**
@@ -106,14 +105,16 @@ export function createValue( element, multiline, settings ) {
  * @return {Object} A rich text record.
  */
 function createRecord( element, range, settings = {} ) {
-	if ( ! element ) {
-		return {
-			value: {
-				formats: [],
-				text: '',
-			},
-			selection: {},
-		};
+	const emptyRecord = {
+		value: {
+			formats: [],
+			text: '',
+		},
+		selection: {},
+	};
+
+	if ( ! element || ! element.hasChildNodes() ) {
+		return emptyRecord;
 	}
 
 	const {
@@ -127,45 +128,29 @@ function createRecord( element, range, settings = {} ) {
 	// format the HTML. Line breaks in HTML are stored as BR elements.
 	const filterStringComplete = ( string ) => filterString( string.replace( '\n', '' ) );
 
-	if (
-		element.nodeName === 'BR' &&
-		! removeNodeMatch( element ) &&
-		! unwrapNodeMatch( element )
-	) {
-		return {
-			value: {
-				formats: Array( 1 ),
-				text: '\n',
-			},
-			selection: {},
-		};
-	}
-
-	if ( ! element.hasChildNodes() ) {
-		return {
-			value: {
-				formats: [],
-				text: '',
-			},
-			selection: {},
-		};
-	}
-
 	return Array.from( element.childNodes ).reduce( ( accumulator, node ) => {
 		const { formats } = accumulator.value;
 
 		if ( node.nodeType === TEXT_NODE ) {
+			const nodeValue = node.nodeValue;
+			const text = filterStringComplete( nodeValue );
+
 			if ( range ) {
+				const textLength = accumulator.value.text.length;
+
 				if ( node === range.startContainer ) {
-					accumulator.selection.start = accumulator.value.text.length + filterStringComplete( node.nodeValue.slice( 0, range.startOffset ) ).length;
+					const charactersBefore = nodeValue.slice( 0, range.startOffset );
+					const lengthBefore = filterStringComplete( charactersBefore ).length;
+					accumulator.selection.start = textLength + lengthBefore;
 				}
 
 				if ( node === range.endContainer ) {
-					accumulator.selection.end = accumulator.value.text.length + filterStringComplete( node.nodeValue.slice( 0, range.endOffset ) ).length;
+					const charactersBefore = nodeValue.slice( 0, range.endOffset );
+					const lengthBefore = filterStringComplete( charactersBefore ).length;
+					accumulator.selection.end = textLength + lengthBefore;
 				}
 			}
 
-			const text = filterStringComplete( node.nodeValue, accumulator.selection );
 			accumulator.value.text += text;
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
@@ -191,12 +176,21 @@ function createRecord( element, range, settings = {} ) {
 				}
 			}
 
+			if ( node.nodeName === 'BR' ) {
+				if ( unwrapNodeMatch( node ) ) {
+					return accumulator;
+				}
+
+				accumulator.value.text += '\n';
+				formats.length += 1;
+				return accumulator;
+			}
+
 			let format;
 
-			if ( ! unwrapNodeMatch( node ) && node.nodeName !== 'BR' ) {
+			if ( ! unwrapNodeMatch( node ) ) {
 				const type = node.nodeName.toLowerCase();
 				const attributes = getAttributes( node, { removeAttributeMatch } );
-
 				format = attributes ? { type, attributes } : { type };
 			}
 
@@ -235,10 +229,6 @@ function createRecord( element, range, settings = {} ) {
 							formats[ index ] = value.formats[ i ];
 						}
 					}
-
-					if ( ! formats[ index ] ) {
-						formats[ index ] = undefined;
-					}
 				}
 			}
 
@@ -252,13 +242,7 @@ function createRecord( element, range, settings = {} ) {
 		}
 
 		return accumulator;
-	}, {
-		value: {
-			formats: [],
-			text: '',
-		},
-		selection: {},
-	} );
+	}, emptyRecord );
 }
 
 /**
