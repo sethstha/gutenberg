@@ -205,6 +205,11 @@ export default class TinyMCE extends Component {
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
 		// us to show and focus the content before it's truly ready to edit.
+		let initialHTML = defaultValue;
+
+		if ( typeof defaultValue !== 'string' ) {
+			initialHTML = toHTMLString( defaultValue, multilineTag );
+		}
 
 		return createElement( tagName, {
 			...ariaProps,
@@ -214,7 +219,7 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: toHTMLString( defaultValue, multilineTag ) },
+			dangerouslySetInnerHTML: { __html: initialHTML },
 			onPaste,
 		} );
 	}

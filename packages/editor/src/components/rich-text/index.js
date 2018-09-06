@@ -9,6 +9,7 @@ import {
 	noop,
 } from 'lodash';
 import 'element-closest';
+import memize from 'memize';
 
 /**
  * WordPress dependencies
@@ -105,6 +106,10 @@ export class RichText extends Component {
 		this.removeFormat = this.removeFormat.bind( this );
 		this.getActiveFormat = this.getActiveFormat.bind( this );
 		this.toggleFormat = this.toggleFormat.bind( this );
+		this.isEmpty = this.isEmpty.bind( this );
+		this.valueToFormat = this.valueToFormat.bind( this );
+
+		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
 		this.savedContent = value;
 		this.containerRef = createRef();
@@ -240,7 +245,7 @@ export class RichText extends Component {
 	 */
 	getRecord() {
 		return {
-			value: this.props.value,
+			value: this.formatToValue( this.props.value ),
 			selection: this.state.selection,
 		};
 	}
@@ -302,6 +307,10 @@ export class RichText extends Component {
 		}
 	}
 
+	isEmpty() {
+		return isEmpty( this.formatToValue( this.props.value ) );
+	}
+
 	/**
 	 * Handles a paste event from TinyMCE.
 	 *
@@ -348,7 +357,7 @@ export class RichText extends Component {
 				mode: 'BLOCKS',
 				tagName: this.props.tagName,
 			} );
-			const shouldReplace = this.props.onReplace && isEmpty( this.props.value );
+			const shouldReplace = this.props.onReplace && this.isEmpty();
 
 			// Allows us to ask for this information when we get a report.
 			window.console.log( 'Received item:\n\n', file );
@@ -385,7 +394,7 @@ export class RichText extends Component {
 			}
 		}
 
-		const shouldReplace = this.props.onReplace && isEmpty( this.props.value );
+		const shouldReplace = this.props.onReplace && this.isEmpty();
 
 		let mode = 'INLINE';
 
@@ -484,8 +493,8 @@ export class RichText extends Component {
 			this.applyRecord( record );
 		}
 
-		this.savedContent = record.value;
-		this.props.onChange( record.value );
+		this.savedContent = this.valueToFormat( record.value );
+		this.props.onChange( this.savedContent );
 		this.setState( { selection: record.selection } );
 	}
 
@@ -521,7 +530,7 @@ export class RichText extends Component {
 	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
 	 */
 	onDeleteKeyDown( event ) {
-		const { onMerge, onRemove, value } = this.props;
+		const { onMerge, onRemove } = this.props;
 		if ( ! onMerge && ! onRemove ) {
 			return;
 		}
@@ -542,14 +551,13 @@ export class RichText extends Component {
 			return;
 		}
 
+		const empty = this.isEmpty();
+
 		// It is important to consider emptiness because an empty container
 		// will include a bogus TinyMCE BR node _after_ the caret, so in a
 		// forward deletion the isHorizontalEdge function will incorrectly
 		// interpret the presence of the bogus node as not being at the edge.
-		const isEdge = (
-			isEmpty( value ) ||
-			isHorizontalEdge( this.editor.getBody(), isReverse )
-		);
+		const isEdge = ( empty || isHorizontalEdge( this.editor.getBody(), isReverse ) );
 
 		if ( ! isEdge ) {
 			return;
@@ -563,7 +571,7 @@ export class RichText extends Component {
 		// an intentional user interaction distinguishing between Backspace and
 		// Delete to remove the empty field, but also to avoid merge & remove
 		// causing destruction of two fields (merge, then removed merged).
-		if ( onRemove && isEmpty( value ) && isReverse ) {
+		if ( onRemove && empty && isReverse ) {
 			onRemove( ! isReverse );
 		}
 
@@ -696,7 +704,7 @@ export class RichText extends Component {
 				const before = createValue( beforeFragment, multiline, richTextStructureSettings );
 				const after = createValue( afterFragment, multiline, richTextStructureSettings );
 
-				this.props.onSplit( before, after );
+				this.props.onSplit( this.valueToFormat( before ), this.valueToFormat( after ) );
 			} else {
 				event.preventDefault();
 
@@ -794,6 +802,14 @@ export class RichText extends Component {
 			after = isEmpty( after ) ? null : after;
 		}
 
+		if ( before ) {
+			before = this.valueToFormat( before );
+		}
+
+		if ( after ) {
+			after = this.valueToFormat( after );
+		}
+
 		onSplit( before, after, ...blocks );
 	}
 
@@ -831,10 +847,30 @@ export class RichText extends Component {
 			value !== this.savedContent
 		) {
 			this.applyRecord( {
-				value,
+				value: this.formatToValue( value ),
 				selection: this.editor.hasFocus() ? selection : undefined,
 			} );
 		}
+	}
+
+	formatToValue( value ) {
+		const { format, multiline } = this.props;
+
+		if ( format === 'string' ) {
+			return createValue( value, multiline );
+		}
+
+		return value;
+	}
+
+	valueToFormat( value ) {
+		const { format, multiline } = this.props;
+
+		if ( format === 'string' ) {
+			return toHTMLString( { value }, multiline );
+		}
+
+		return value;
 	}
 
 	render() {
@@ -859,7 +895,7 @@ export class RichText extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && isEmpty( value );
+		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
 		const classes = classnames( wrapperClassName, 'editor-rich-text' );
 
 		const formatToolbar = (
@@ -940,6 +976,7 @@ export class RichText extends Component {
 
 RichText.defaultProps = {
 	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
+	format: 'children',
 };
 
 const RichTextContainer = compose( [
@@ -987,12 +1024,14 @@ const RichTextContainer = compose( [
 	withSafeTimeout,
 ] )( RichText );
 
-RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
-	const content = (
-		<RawHTML>
-			{ toHTMLString( value, multiline ) }
-		</RawHTML>
-	);
+RichTextContainer.Content = ( { value, format, tagName: Tag, multiline, ...props } ) => {
+	let html = value;
+
+	if ( format !== 'string' ) {
+		html = toHTMLString( { value }, multiline );
+	}
+
+	const content = <RawHTML>{ html }</RawHTML>;
 
 	if ( Tag ) {
 		return <Tag { ...props }>{ content }</Tag>;
@@ -1003,5 +1042,9 @@ RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => 
 
 RichTextContainer.isEmpty = isEmpty;
 RichTextContainer.concat = concat;
+
+RichTextContainer.Content.defaultProps = {
+	format: 'children',
+};
 
 export default RichTextContainer;
