@@ -132,7 +132,7 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 
 .freeform-toolbar {
 	width: auto;
-	margin: 0 #{ -$parent-block-padding };
+	margin: 0 #{ -$block-padding };
 	position: sticky;
 	z-index: z-index(".freeform-toolbar");
 	top: $block-padding;
@@ -186,7 +186,7 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	.editor-block-list__block[data-type="core/freeform"] {
 		.editor-block-contextual-toolbar {
 			float: right;
-			margin-right: -$block-padding - $block-side-ui-clearance - $border-width;
+			margin-right: -$block-side-ui-clearance - $border-width;
 			transform: translateY(-#{ $block-padding - $border-width });
 			top: $block-padding;
 		}

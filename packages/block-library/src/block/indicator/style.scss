@@ -8,10 +8,5 @@
 	padding: 5px;
 	position: absolute;
 	width: 30px;
-	right: -$parent-block-padding;
-
-	// Show less offset in nested contexts.
-	.editor-block-list__layout & {
-		right: -$block-padding;
-	}
+	right: -$block-padding;
 }
