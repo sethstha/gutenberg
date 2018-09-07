@@ -27,15 +27,15 @@ describe( 'recordToDom', () => {
 		const range = {
 			startOffset: 1,
 			startContainer: node.querySelector( 'em' ).firstChild,
-			endOffset: 0,
+			endOffset: 1,
 			endContainer: node.querySelector( 'strong' ).firstChild,
 		};
 		const { body, selection } = recordToDom( create( node, range ) );
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
-			startPath: [ 1, 0, range.startOffset ],
-			endPath: [ 3, 1, 0, range.endOffset ],
+			startPath: [ 1, 0, 1 ],
+			endPath: [ 3, 1, 0, 1 ],
 		} );
 	} );
 
@@ -52,8 +52,8 @@ describe( 'recordToDom', () => {
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
-			startPath: [ 1, 0, range.startOffset ],
-			endPath: [ 3, 2, 0, range.endOffset ],
+			startPath: [ 1, 0, 1 ],
+			endPath: [ 3, 0, 5 ],
 		} );
 	} );
 
@@ -63,15 +63,15 @@ describe( 'recordToDom', () => {
 		const range = {
 			startOffset: 0,
 			startContainer: node,
-			endOffset: 0,
+			endOffset: 1,
 			endContainer: node,
 		};
 		const { body, selection } = recordToDom( create( node, range ) );
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
-			startPath: [ 1 ],
-			endPath: [ 1 ],
+			startPath: [ 1, 0 ],
+			endPath: [ 1, 0 ],
 		} );
 	} );
 
@@ -107,7 +107,25 @@ describe( 'recordToDom', () => {
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
 			startPath: [ 0, 0, 1 ],
-			endPath: [ 0, 1, 0, 0 ],
+			endPath: [ 0, 0, 135 ],
+		} );
+	} );
+
+	it( 'should create correct selection path ', () => {
+		const HTML = 'test <em>italic</em>';
+		const node = createNode( `<p>${ HTML }</p>` );
+		const range = {
+			startOffset: 1,
+			startContainer: node,
+			endOffset: 2,
+			endContainer: node,
+		};
+		const { body, selection } = recordToDom( create( node, range ) );
+
+		expect( body.innerHTML ).toEqual( node.innerHTML );
+		expect( selection ).toEqual( {
+			startPath: [ 1, 0, 0 ],
+			endPath: [ 1, 0, 6 ],
 		} );
 	} );
 

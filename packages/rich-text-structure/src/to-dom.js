@@ -108,12 +108,14 @@ export function recordToDom( { value, selection = {} }, tag ) {
 		}
 
 		if ( start === i ) {
-			const initialPath = pointer.nodeValue ? [ pointer.nodeValue.length - 1 ] : [];
+			const initialPath = [ character ? pointer.nodeValue.length - 1 : 0 ];
 			startPath = createPathToNode( pointer, body, initialPath );
 		}
 
-		if ( end === i ) {
-			const initialPath = pointer.nodeValue ? [ pointer.nodeValue.length - 1 ] : [];
+		if ( start === end ) {
+			endPath = startPath;
+		} else if ( end === i + 1 ) {
+			const initialPath = [ pointer.nodeValue.length ];
 			endPath = createPathToNode( pointer, body, initialPath );
 		}
 	}

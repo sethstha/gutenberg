@@ -199,6 +199,16 @@ function createRecord( element, range, settings = {} ) {
 		const text = value.text;
 		const start = accumulator.value.text.length;
 
+		// Expand range if it ends in this node.
+		if ( range ) {
+			if (
+				node.parentNode === range.endContainer &&
+				node === range.endContainer.childNodes[ range.endOffset - 1 ]
+			) {
+				accumulator.selection.end = start + text.length;
+			}
+		}
+
 		if ( format && text.length === 0 ) {
 			format.object = true;
 

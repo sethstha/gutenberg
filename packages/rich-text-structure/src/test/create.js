@@ -78,6 +78,30 @@ describe( 'create', () => {
 		expect( value.formats[ 2 ][ 1 ] ).toBe( value.formats[ 3 ][ 1 ] );
 	} );
 
+	it( 'should extract text with node selection', () => {
+		const element = createNode( '<p>one <em>two 🍒</em></p>' );
+		const range = {
+			startOffset: 1,
+			startContainer: element,
+			endOffset: 2,
+			endContainer: element,
+		};
+		const actual = create( element, range );
+
+		expect( actual ).toEqual( {
+			value: {
+				formats: [ , , , , [ em ], [ em ], [ em ], [ em ], [ em ], [ em ] ],
+				text: 'one two 🍒',
+			},
+			selection: {
+				start: 4,
+				end: 10,
+			},
+		} );
+
+		expect( getSparseArrayLength( actual.value.formats ) ).toBe( 6 );
+	} );
+
 	it( 'should extract multiline text', () => {
 		const element = createNode( '<div><p>one <em>two</em> three</p><p>test</p></div>' );
 		const range = {
