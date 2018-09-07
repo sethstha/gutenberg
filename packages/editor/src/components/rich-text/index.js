@@ -34,8 +34,6 @@ import {
 	create,
 	apply,
 	applyFormat,
-	removeFormat,
-	getActiveFormat,
 	split,
 	toHTMLString,
 	createValue,
@@ -102,10 +100,6 @@ export class RichText extends Component {
 		this.getRecord = this.getRecord.bind( this );
 		this.createRecord = this.createRecord.bind( this );
 		this.applyRecord = this.applyRecord.bind( this );
-		this.applyFormat = this.applyFormat.bind( this );
-		this.removeFormat = this.removeFormat.bind( this );
-		this.getActiveFormat = this.getActiveFormat.bind( this );
-		this.toggleFormat = this.toggleFormat.bind( this );
 		this.isEmpty = this.isEmpty.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 
@@ -205,11 +199,6 @@ export class RichText extends Component {
 	}
 
 	onInit() {
-		this.editor.shortcuts.add( rawShortcut.primary( 'k' ), '', () => this.applyFormat( { type: 'a', attributes: { href: '' } } ) );
-		this.editor.shortcuts.add( rawShortcut.access( 'a' ), '', () => this.applyFormat( { type: 'a', attributes: { href: '' } } ) );
-		this.editor.shortcuts.add( rawShortcut.access( 's' ), '', () => this.removeFormat( 'a' ) );
-		this.editor.shortcuts.add( rawShortcut.access( 'd' ), '', () => this.toggleFormat( { type: 'del' } ) );
-		this.editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => this.toggleFormat( { type: 'code' } ) );
 		this.editor.shortcuts.add( rawShortcut.primary( 'z' ), '', 'Undo' );
 		this.editor.shortcuts.add( rawShortcut.primaryShift( 'z' ), '', 'Redo' );
 
@@ -263,48 +252,6 @@ export class RichText extends Component {
 		const rootNode = this.editor.getBody();
 
 		apply( record, rootNode, multiline );
-	}
-
-	/**
-	 * Apply a format with the current value and selection.
-	 *
-	 * @param {Object} format The format to apply.
-	 */
-	applyFormat( format ) {
-		this.onChange( applyFormat( this.getRecord(), format ) );
-	}
-
-	/**
-	 * Remove a format from the current value with the current selection.
-	 *
-	 * @param {string} formatType The type of format to remove.
-	 */
-	removeFormat( formatType ) {
-		this.onChange( removeFormat( this.getRecord(), formatType ) );
-	}
-
-	/**
-	 * Get the current format based on the selection
-	 *
-	 * @param {string} formatType The type of format to check.
-	 *
-	 * @return {boolean} Whether the format is active or not.
-	 */
-	getActiveFormat( formatType ) {
-		return getActiveFormat( this.getRecord(), formatType );
-	}
-
-	/**
-	 * Toggle a format based on the selection.
-	 *
-	 * @param {Object} format The format to toggle.
-	 */
-	toggleFormat( format ) {
-		if ( this.getActiveFormat( format.type ) ) {
-			this.removeFormat( format.type );
-		} else {
-			this.applyFormat( format );
-		}
 	}
 
 	isEmpty() {
@@ -380,12 +327,12 @@ export class RichText extends Component {
 
 			// A URL was pasted, turn the selection into a link
 			if ( isURL( pastedText ) ) {
-				this.applyFormat( {
+				this.onChange( applyFormat( this.getRecord(), {
 					type: 'a',
 					attributes: {
 						href: this.editor.dom.decode( pastedText ),
 					},
-				} );
+				} ) );
 
 				// Allows us to ask for this information when we get a report.
 				window.console.log( 'Created link:\n\n', pastedText );
@@ -897,15 +844,14 @@ export class RichText extends Component {
 		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
 		const classes = classnames( wrapperClassName, 'editor-rich-text' );
+		const record = this.getRecord();
 
-		const formatToolbar = (
+		const formatToolbar = this.editor && (
 			<FormatToolbar
-				selection={ this.state.selection }
-				applyFormat={ this.applyFormat }
-				removeFormat={ this.removeFormat }
-				getActiveFormat={ this.getActiveFormat }
-				toggleFormat={ this.toggleFormat }
+				record={ record }
+				onChange={ this.onChange }
 				enabledControls={ formattingControls }
+				editor={ this.editor }
 			/>
 		);
 
@@ -934,7 +880,7 @@ export class RichText extends Component {
 				<Autocomplete
 					onReplace={ this.props.onReplace }
 					completers={ autocompleters }
-					record={ this.getRecord() }
+					record={ record }
 					onChange={ this.onChange }
 				>
 					{ ( { isExpanded, listBoxId, activeId } ) => (

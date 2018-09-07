@@ -68,12 +68,12 @@ describe( 'Links', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg: ' );
 
-		// Press Cmd+K to insert a link
-		await pressWithModifier( META_KEY, 'K' );
-
 		// Trigger isTyping = false
 		await page.mouse.move( 200, 300, { steps: 10 } );
 		await page.mouse.move( 250, 350, { steps: 10 } );
+
+		// Press Cmd+K to insert a link
+		await pressWithModifier( META_KEY, 'K' );
 
 		// Type a URL
 		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
@@ -142,10 +142,10 @@ describe( 'Links', () => {
 		await page.click( 'button[aria-label="Apply"]' );
 
 		// Click somewhere else - it doesn't really matter where
-		await page.click( '.editor-post-title' );
+		// await page.click( '.editor-post-title' );
 
 		// Select the link again
-		await page.click( 'a[href="https://wordpress.org/gutenberg"]' );
+		// await page.click( 'a[href="https://wordpress.org/gutenberg"]' );
 	};
 
 	it( 'can be edited', async () => {

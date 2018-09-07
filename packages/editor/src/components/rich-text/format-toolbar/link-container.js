@@ -13,6 +13,10 @@ import {
 } from '@wordpress/components';
 import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
+import {
+	splice,
+	isCollapsed,
+} from '@wordpress/rich-text-structure';
 
 /**
  * Internal dependencies
@@ -24,7 +28,7 @@ import { filterURLForDisplay } from '../../../utils/url';
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 class LinkContainer extends Component {
-	constructor( { link, selection } ) {
+	constructor( { record } ) {
 		super( ...arguments );
 
 		this.editLink = this.editLink.bind( this );
@@ -33,24 +37,23 @@ class LinkContainer extends Component {
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
 		this.toggleLinkSettingsVisibility = this.toggleLinkSettingsVisibility.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
+		this.resetState = this.resetState.bind( this );
 
 		this.state = {
-			inputValue: link && link.attributes && link.attributes.href ? null : '',
-			opensInNewWindow: null,
-			lastSelection: selection,
+			inputValue: '',
+			opensInNewWindow: false,
+			lastSelection: record.selection,
 			selectionKey: 0,
 		};
 	}
 
-	static getDerivedStateFromProps( { link, selection }, state ) {
-		if ( selection === state.lastSelection ) {
+	static getDerivedStateFromProps( { record }, state ) {
+		if ( record.selection === state.lastSelection ) {
 			return null;
 		}
 
 		return {
-			inputValue: link && link.attributes && link.attributes.href ? null : '',
-			opensInNewWindow: null,
-			lastSelection: selection,
+			lastSelection: record.selection,
 			selectionKey: state.selectionKey + 1,
 		};
 	}
@@ -58,11 +61,7 @@ class LinkContainer extends Component {
 	onKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
 			event.stopPropagation();
-			this.props.removeFormat( 'a' );
-			this.setState( {
-				inputValue: null,
-				opensInNewWindow: null,
-			} );
+			this.resetState();
 		}
 
 		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
@@ -102,6 +101,7 @@ class LinkContainer extends Component {
 		const { link } = this.props;
 
 		this.setState( {
+			editLink: true,
 			inputValue: link.attributes.href,
 			opensInNewWindow: link.attributes.target === '_blank',
 		} );
@@ -110,7 +110,7 @@ class LinkContainer extends Component {
 	}
 
 	submitLink( event ) {
-		const { link } = this.props;
+		const { link, record } = this.props;
 		const { inputValue, opensInNewWindow } = this.state;
 		const href = prependHTTP( inputValue );
 		const format = {
@@ -125,12 +125,13 @@ class LinkContainer extends Component {
 			format.attributes.rel = 'noreferrer noopener';
 		}
 
-		this.props.applyFormat( format );
+		if ( isCollapsed( record ) ) {
+			this.props.onChange( splice( record, undefined, undefined, href, format ) );
+		} else {
+			this.props.applyFormat( format );
+		}
 
-		this.setState( {
-			inputValue: null,
-			opensInNewWindow: null,
-		} );
+		this.resetState();
 
 		if ( ! link ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
@@ -139,10 +140,19 @@ class LinkContainer extends Component {
 		event.preventDefault();
 	}
 
-	render() {
-		const { link } = this.props;
+	resetState() {
+		this.props.stopAddingLink();
+		this.setState( {
+			inputValue: '',
+			opensInNewWindow: false,
+			editLink: false,
+		} );
+	}
 
-		if ( ! link ) {
+	render() {
+		const { link, addingLink } = this.props;
+
+		if ( ! link && ! addingLink ) {
 			return null;
 		}
 
@@ -156,6 +166,8 @@ class LinkContainer extends Component {
 			</div>
 		);
 
+		const showInput = ( addingLink || this.state.editLink );
+
 		return (
 			<Fill name="RichText.Siblings">
 				<PositionedAtSelection
@@ -164,9 +176,10 @@ class LinkContainer extends Component {
 				>
 					<Popover
 						position="bottom center"
-						focusOnMount={ inputValue === null ? false : 'firstElement' }
+						focusOnMount={ addingLink ? 'firstElement' : false }
+						onClickOutside={ this.resetState }
 					>
-						{ inputValue !== null && (
+						{ showInput && (
 							// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 							<form
@@ -191,7 +204,7 @@ class LinkContainer extends Component {
 							/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 						) }
 
-						{ inputValue === null && (
+						{ ! showInput && (
 							// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-static-element-interactions */
 							<div
