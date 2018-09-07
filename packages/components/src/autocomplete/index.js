@@ -8,11 +8,16 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, renderToString } from '@wordpress/element';
 import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { getTextContent, splice, isCollapsed } from '@wordpress/rich-text-structure';
+import {
+	create as createRichTextStructure,
+	getTextContent,
+	splice,
+	isCollapsed,
+} from '@wordpress/rich-text-structure';
 import { getRectangleFromRange } from '@wordpress/dom';
 
 /**
@@ -196,9 +201,11 @@ export class Autocomplete extends Component {
 		const { open, query } = this.state;
 		const { record, onChange } = this.props;
 
-		replacement = replacement.slice( open.triggerPrefix.length + query.length );
-
-		onChange( splice( record, undefined, 0, replacement ) );
+		const deleteCount = open.triggerPrefix.length + query.length;
+		const replacementStart = record.selection.start - deleteCount;
+		const replacementHTML = renderToString( replacement );
+		const replacementRecord = createRichTextStructure( replacementHTML );
+		onChange( splice( record, replacementStart, deleteCount, replacementRecord.value.text, replacementRecord.value.formats ) );
 	}
 
 	select( option ) {
