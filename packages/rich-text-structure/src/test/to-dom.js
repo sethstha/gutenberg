@@ -70,8 +70,8 @@ describe( 'recordToDom', () => {
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
-			startPath: [ 1, 0 ],
-			endPath: [ 1, 0 ],
+			startPath: [],
+			endPath: [],
 		} );
 	} );
 
@@ -124,7 +124,7 @@ describe( 'recordToDom', () => {
 
 		expect( body.innerHTML ).toEqual( node.innerHTML );
 		expect( selection ).toEqual( {
-			startPath: [ 1, 0, 0 ],
+			startPath: [ 0, 5 ],
 			endPath: [ 1, 0, 6 ],
 		} );
 	} );

@@ -12,7 +12,6 @@ import {
 	getPhrasingContentSchema,
 	getBlockAttributes,
 	getBlockType,
-	children,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
@@ -166,10 +165,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat(
-				attributes.content,
-				attributesToMerge.content
-			),
+			content: RichText.concat( attributes.content, attributesToMerge.content ),
 		};
 	},
 

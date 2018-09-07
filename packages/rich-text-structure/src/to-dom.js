@@ -107,8 +107,8 @@ export function recordToDom( { value, selection = {} }, tag ) {
 			}
 		}
 
-		if ( start === i ) {
-			const initialPath = [ character ? pointer.nodeValue.length - 1 : 0 ];
+		if ( start === i + 1 ) {
+			const initialPath = [ pointer.nodeValue.length ];
 			startPath = createPathToNode( pointer, body, initialPath );
 		}
 
