@@ -6,9 +6,9 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 ### `format: String`
 
- *Optional.* Format of the RichText provided value prop. It can be `children` or `string`.
+*Optional.* Format of the RichText provided value prop. It can be `children` or `string`.
 
- *Default: `children`*.
+*Default: `children`*.
 
 ### `value: Array|String`
 
