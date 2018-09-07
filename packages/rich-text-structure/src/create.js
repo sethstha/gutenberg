@@ -1,4 +1,10 @@
 /**
+ * Internal dependencies
+ */
+
+import { isEmpty } from './is-empty';
+
+/**
  * Browser dependencies
  */
 
@@ -195,6 +201,12 @@ function createRecord( element, range, settings = {} ) {
 		}
 
 		const { value, selection } = createRecord( node, range, settings );
+
+		// Don't apply the element as formatting if it has no content.
+		if ( isEmpty( value ) && format && ! format.attributes ) {
+			return accumulator;
+		}
+
 		const { formats } = accumulator.value;
 		const text = value.text;
 		const start = accumulator.value.text.length;
@@ -209,7 +221,7 @@ function createRecord( element, range, settings = {} ) {
 			}
 		}
 
-		if ( format && text.length === 0 ) {
+		if ( format && format.attributes && text.length === 0 ) {
 			format.object = true;
 
 			if ( formats[ start ] ) {

@@ -21,6 +21,202 @@ function createNode( HTML ) {
 	return doc.body.firstChild;
 }
 
+describe( 'createValue', () => {
+	const em = { type: 'em' };
+	const strong = { type: 'strong' };
+	const img = { type: 'img', attributes: { src: '' }, object: true };
+	const a = { type: 'a', attributes: { href: '#' } };
+	const list = [ { type: 'ul' }, { type: 'li' } ];
+
+	const spec = [
+		{
+			description: 'should create an empty value',
+			html: '',
+			value: {
+				formats: [],
+				text: '',
+			},
+		},
+		{
+			description: 'should create an empty value from empty tags',
+			html: '<em></em>',
+			value: {
+				formats: [],
+				text: '',
+			},
+		},
+		{
+			description: 'should create a value without formatting',
+			html: 'test',
+			value: {
+				formats: [ , , , , ],
+				text: 'test',
+			},
+		},
+		{
+			description: 'should preserve emoji',
+			html: '🍒',
+			value: {
+				formats: [ , , ],
+				text: '🍒',
+			},
+		},
+		{
+			description: 'should preserve emoji in formatting',
+			html: '<em>🍒</em>',
+			value: {
+				formats: [ [ em ], [ em ] ],
+				text: '🍒',
+			},
+		},
+		{
+			description: 'should create a value with formatting',
+			html: '<em>test</em>',
+			value: {
+				formats: [ [ em ], [ em ], [ em ], [ em ] ],
+				text: 'test',
+			},
+		},
+		{
+			description: 'should create a value with nested formatting',
+			html: '<em><strong>test</strong></em>',
+			value: {
+				formats: [ [ em, strong ], [ em, strong ], [ em, strong ], [ em, strong ] ],
+				text: 'test',
+			},
+		},
+		{
+			description: 'should create a value with formatting for split tags',
+			html: '<em>te</em><em>st</em>',
+			value: {
+				formats: [ [ em ], [ em ], [ em ], [ em ] ],
+				text: 'test',
+			},
+		},
+		{
+			description: 'should create a value with formatting with attributes',
+			html: '<a href="#">test</a>',
+			value: {
+				formats: [ [ a ], [ a ], [ a ], [ a ] ],
+				text: 'test',
+			},
+		},
+		{
+			description: 'should create a value with image object',
+			html: '<img src="">',
+			value: {
+				formats: [ [ img ] ],
+				text: '',
+			},
+		},
+		{
+			description: 'should create a value with image object and formatting',
+			html: '<em><img src=""></em>',
+			value: {
+				formats: [ [ em, img ] ],
+				text: '',
+			},
+		},
+		{
+			description: 'should create a value with image object and text before',
+			html: 'te<em>st<img src=""></em>',
+			value: {
+				formats: [ , , [ em ], [ em ], [ em, img ] ],
+				text: 'test',
+			},
+		},
+		{
+			description: 'should create a value with image object and text after',
+			html: '<em><img src="">te</em>st',
+			value: {
+				formats: [ [ em, img ], [ em ], [ em ], , , ],
+				text: 'test',
+			},
+		},
+		{
+			description: 'should handle br',
+			html: '<br>',
+			value: {
+				formats: [ , ],
+				text: '\n',
+			},
+		},
+		{
+			description: 'should handle br with text',
+			html: 'te<br>st',
+			value: {
+				formats: [ , , , , , ],
+				text: 'te\nst',
+			},
+		},
+		{
+			description: 'should handle br with formatting',
+			html: '<em><br></em>',
+			value: {
+				formats: [ [ em ] ],
+				text: '\n',
+			},
+		},
+		{
+			description: 'should handle multiline value',
+			multiline: 'p',
+			html: '<p>one</p><p>two</p>',
+			value: [
+				{
+					formats: [ , , , ],
+					text: 'one',
+				},
+				{
+					formats: [ , , , ],
+					text: 'two',
+				},
+			],
+		},
+		{
+			description: 'should handle multiline list value',
+			multiline: 'li',
+			html: '<li>one<ul><li>two</li></ul></li><li>three</li>',
+			value: [
+				{
+					formats: [ , , , list, list, list ],
+					text: 'onetwo',
+				},
+				{
+					formats: [ , , , , , ],
+					text: 'three',
+				},
+			],
+		},
+	];
+
+	spec.forEach( ( { description, multiline, html, value } ) => {
+		it( description, () => {
+			const createdValue = createValue( html, multiline );
+			expect( createdValue ).toEqual( value );
+
+			if ( ! multiline ) {
+				const formatsLength = getSparseArrayLength( value.formats );
+				const createdFormatsLength = getSparseArrayLength( createdValue.formats );
+				expect( createdFormatsLength ).toEqual( formatsLength );
+			}
+		} );
+	} );
+
+	it( 'should reference formats', () => {
+		const element = createNode( '<p><em>te<strong>st</strong></em></p>' );
+		const value = createValue( element );
+
+		expect( value ).toEqual( {
+			formats: [ [ em ], [ em ], [ em, strong ], [ em, strong ] ],
+			text: 'test',
+		} );
+
+		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 1 ][ 0 ] );
+		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 2 ][ 0 ] );
+		expect( value.formats[ 2 ][ 1 ] ).toBe( value.formats[ 3 ][ 1 ] );
+	} );
+} );
+
 describe( 'create', () => {
 	const em = { type: 'em' };
 	const strong = { type: 'strong' };
@@ -62,20 +258,6 @@ describe( 'create', () => {
 		} );
 
 		expect( getSparseArrayLength( actual.value.formats ) ).toBe( 12 );
-	} );
-
-	it( 'should reference formats', () => {
-		const element = createNode( '<p><em>te<strong>st</strong></em></p>' );
-		const value = createValue( element );
-
-		expect( value ).toEqual( {
-			formats: [ [ em ], [ em ], [ em, strong ], [ em, strong ] ],
-			text: 'test',
-		} );
-
-		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 1 ][ 0 ] );
-		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 2 ][ 0 ] );
-		expect( value.formats[ 2 ][ 1 ] ).toBe( value.formats[ 3 ][ 1 ] );
 	} );
 
 	it( 'should extract text with node selection', () => {
@@ -130,28 +312,6 @@ describe( 'create', () => {
 		} );
 		expect( getSparseArrayLength( actual.value[ 0 ].formats ) ).toBe( 3 );
 		expect( getSparseArrayLength( actual.value[ 1 ].formats ) ).toBe( 0 );
-	} );
-
-	it( 'should extract multiline text list', () => {
-		const element = createNode( '<ul><li>one<ul><li>two</li></ul></li><li>three</li></ul>' );
-		const actual = createValue( element, 'li' );
-
-		expect( createValue( element, 'li' ) ).toEqual( [
-			{
-				formats: [ , , ,
-					[ { type: 'ul' }, { type: 'li' } ],
-					[ { type: 'ul' }, { type: 'li' } ],
-					[ { type: 'ul' }, { type: 'li' } ],
-				],
-				text: 'onetwo',
-			},
-			{
-				formats: [ , , , , , ],
-				text: 'three',
-			},
-		] );
-		expect( getSparseArrayLength( actual[ 0 ].formats ) ).toBe( 3 );
-		expect( getSparseArrayLength( actual[ 1 ].formats ) ).toBe( 0 );
 	} );
 
 	it( 'should skip bogus 1', () => {
