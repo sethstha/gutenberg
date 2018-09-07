@@ -9,17 +9,10 @@ import { JSDOM } from 'jsdom';
  */
 
 import { create, createValue } from '../create';
-import { toHTMLString } from '../to-html-string';
 import { getSparseArrayLength } from './helpers';
 
 const { window } = new JSDOM();
 const { document } = window;
-
-function createNode( HTML ) {
-	const doc = document.implementation.createHTMLDocument( '' );
-	doc.body.innerHTML = HTML;
-	return doc.body.firstChild;
-}
 
 function createElement( html ) {
 	const htmlDocument = document.implementation.createHTMLDocument( '' );
@@ -402,13 +395,220 @@ describe( 'create', () => {
 				],
 			},
 		},
+		{
+			description: 'should remove with settings',
+			settings: {
+				unwrapNodeMatch: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
+			},
+			html: '<strong data-mce-bogus="true"></strong>',
+			createRange: ( element ) => ( {
+				startOffset: 0,
+				startContainer: element,
+				endOffset: 1,
+				endContainer: element,
+			} ),
+			record: {
+				selection: {
+					start: 0,
+					end: 0,
+				},
+				value: {
+					formats: [],
+					text: '',
+				},
+			},
+		},
+		{
+			description: 'should remove br with settings',
+			settings: {
+				unwrapNodeMatch: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
+			},
+			html: '<br data-mce-bogus="true">',
+			createRange: ( element ) => ( {
+				startOffset: 0,
+				startContainer: element,
+				endOffset: 1,
+				endContainer: element,
+			} ),
+			record: {
+				selection: {
+					start: 0,
+					end: 0,
+				},
+				value: {
+					formats: [],
+					text: '',
+				},
+			},
+		},
+		{
+			description: 'should unwrap with settings',
+			settings: {
+				unwrapNodeMatch: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
+			},
+			html: '<strong data-mce-bogus="true">te<em>st</em></strong>',
+			createRange: ( element ) => ( {
+				startOffset: 0,
+				startContainer: element,
+				endOffset: 1,
+				endContainer: element,
+			} ),
+			record: {
+				selection: {
+					start: 0,
+					end: 4,
+				},
+				value: {
+					formats: [ , , [ em ], [ em ] ],
+					text: 'test',
+				},
+			},
+		},
+		{
+			description: 'should remove with children with settings',
+			settings: {
+				removeNodeMatch: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
+			},
+			html: '<strong data-mce-bogus="all">one</strong>two',
+			createRange: ( element ) => ( {
+				startOffset: 0,
+				startContainer: element.lastChild,
+				endOffset: 1,
+				endContainer: element.lastChild,
+			} ),
+			record: {
+				selection: {
+					start: 0,
+					end: 1,
+				},
+				value: {
+					formats: [ , , , ],
+					text: 'two',
+				},
+			},
+		},
+		{
+			description: 'should filter format attributes with settings',
+			settings: {
+				removeAttributeMatch: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
+			},
+			html: '<strong data-mce-selected="inline-boundary">test</strong>',
+			createRange: ( element ) => ( {
+				startOffset: 0,
+				startContainer: element,
+				endOffset: 1,
+				endContainer: element,
+			} ),
+			record: {
+				selection: {
+					start: 0,
+					end: 4,
+				},
+				value: {
+					formats: [ [ strong ], [ strong ], [ strong ], [ strong ] ],
+					text: 'test',
+				},
+			},
+		},
+		{
+			description: 'should filter text with settings',
+			settings: {
+				filterString: ( string ) => string.replace( '\uFEFF', '' ),
+			},
+			html: '&#65279;',
+			createRange: ( element ) => ( {
+				startOffset: 0,
+				startContainer: element,
+				endOffset: 1,
+				endContainer: element,
+			} ),
+			record: {
+				selection: {
+					start: 0,
+					end: 0,
+				},
+				value: {
+					formats: [],
+					text: '',
+				},
+			},
+		},
+		{
+			description: 'should filter text at end with settings',
+			settings: {
+				filterString: ( string ) => string.replace( '\uFEFF', '' ),
+			},
+			html: 'test&#65279;',
+			createRange: ( element ) => ( {
+				startOffset: 4,
+				startContainer: element.firstChild,
+				endOffset: 4,
+				endContainer: element.firstChild,
+			} ),
+			record: {
+				selection: {
+					start: 4,
+					end: 4,
+				},
+				value: {
+					formats: [ , , , , ],
+					text: 'test',
+				},
+			},
+		},
+		{
+			description: 'should filter text in format with settings',
+			settings: {
+				filterString: ( string ) => string.replace( '\uFEFF', '' ),
+			},
+			html: '<em>test&#65279;</em>',
+			createRange: ( element ) => ( {
+				startOffset: 5,
+				startContainer: element.querySelector( 'em' ).firstChild,
+				endOffset: 5,
+				endContainer: element.querySelector( 'em' ).firstChild,
+			} ),
+			record: {
+				selection: {
+					start: 4,
+					end: 4,
+				},
+				value: {
+					formats: [ [ em ], [ em ], [ em ], [ em ] ],
+					text: 'test',
+				},
+			},
+		},
+		{
+			description: 'should filter text outside format with settings',
+			settings: {
+				filterString: ( string ) => string.replace( '\uFEFF', '' ),
+			},
+			html: '<em>test</em>&#65279;',
+			createRange: ( element ) => ( {
+				startOffset: 1,
+				startContainer: element.lastChild,
+				endOffset: 1,
+				endContainer: element.lastChild,
+			} ),
+			record: {
+				selection: {
+					start: 4,
+					end: 4,
+				},
+				value: {
+					formats: [ [ em ], [ em ], [ em ], [ em ] ],
+					text: 'test',
+				},
+			},
+		},
 	];
 
-	spec.forEach( ( { description, multiline, html, createRange, record } ) => {
+	spec.forEach( ( { description, multiline, settings, html, createRange, record } ) => {
 		it( description, () => {
 			const element = createElement( html );
 			const range = createRange( element );
-			const createdRecord = create( element, range, multiline );
+			const createdRecord = create( element, range, multiline, settings );
 			expect( createdRecord ).toEqual( record );
 
 			if ( ! multiline ) {
@@ -430,91 +630,5 @@ describe( 'create', () => {
 		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 1 ][ 0 ] );
 		expect( value.formats[ 0 ][ 0 ] ).toBe( value.formats[ 2 ][ 0 ] );
 		expect( value.formats[ 2 ][ 1 ] ).toBe( value.formats[ 3 ][ 1 ] );
-	} );
-} );
-
-describe( 'create with settings', () => {
-	const strong = { type: 'strong' };
-	const settings = {
-		removeNodeMatch: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
-		unwrapNodeMatch: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
-		removeAttributeMatch: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
-		filterString: ( string ) => string.replace( '\uFEFF', '' ),
-	};
-
-	it( 'should skip bogus 1', () => {
-		const element = createNode( '<p><strong data-mce-selected="inline-boundary">&#65279;test</strong></p>' );
-		const range = {
-			startOffset: 1,
-			startContainer: element.querySelector( 'strong' ).firstChild,
-			endOffset: 1,
-			endContainer: element.querySelector( 'strong' ).firstChild,
-		};
-		const actual = create( element, range, false, settings );
-
-		expect( actual ).toEqual( {
-			value: {
-				formats: [ [ strong ], [ strong ], [ strong ], [ strong ] ],
-				text: 'test',
-			},
-			selection: {
-				start: 0,
-				end: 0,
-			},
-		} );
-		expect( getSparseArrayLength( actual.value.formats ) ).toBe( 4 );
-	} );
-
-	it( 'should skip bogus 2', () => {
-		const element = createNode( '<p><strong>test<span data-mce-bogus="all">test</span></strong> test</p>' );
-		const range = {
-			startOffset: 1,
-			startContainer: element.lastChild,
-			endOffset: 1,
-			endContainer: element.lastChild,
-		};
-		const actual = create( element, range, false, settings );
-
-		expect( create( element, range, false, settings ) ).toEqual( {
-			value: {
-				formats: [ [ strong ], [ strong ], [ strong ], [ strong ], , , , , , ],
-				text: 'test test',
-			},
-			selection: {
-				start: 5,
-				end: 5,
-			},
-		} );
-		expect( getSparseArrayLength( actual.value.formats ) ).toBe( 4 );
-	} );
-
-	it( 'should skip bogus 3', () => {
-		const HTML = '<br data-mce-bogus="true">';
-
-		expect( toHTMLString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
-	} );
-
-	it( 'should skip bogus 4', () => {
-		const HTML = '<strong data-mce-bogus="true"></strong>';
-
-		expect( toHTMLString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
-	} );
-
-	it( 'should skip bogus 5', () => {
-		const HTML = '<strong data-mce-bogus="true">test <em>test</em></strong>';
-
-		expect( toHTMLString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( 'test <em>test</em>' );
-	} );
-
-	it( 'should skip bogus 6', () => {
-		const HTML = '<strong data-mce-bogus="all">test</strong>';
-
-		expect( toHTMLString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '' );
-	} );
-
-	it( 'should skip bogus 7', () => {
-		const HTML = '<strong data-mce-selected="inline-boundary">test&#65279;</strong>';
-
-		expect( toHTMLString( createValue( createNode( `<p>${ HTML }</p>` ), false, settings ) ) ).toEqual( '<strong>test</strong>' );
 	} );
 } );
