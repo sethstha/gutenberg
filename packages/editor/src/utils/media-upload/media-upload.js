@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith } from 'lodash';
+import { compact, flatMap, forEach, get, has, includes, map, noop, some, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -68,7 +68,11 @@ export function mediaUpload( {
 
 	// Allowed type specified by consumer
 	const isAllowedType = ( fileType ) => {
-		return ( allowedType === '*' ) || startsWith( fileType, `${ allowedType }/` );
+		return ( allowedType === '*' ) ||
+			some(
+				( allowedType || '' ).split( ',' ),
+				( type ) => startsWith( fileType, `${ type }/` )
+			);
 	};
 
 	// Allowed types for the current WP_User

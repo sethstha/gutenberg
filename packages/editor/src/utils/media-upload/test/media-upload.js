@@ -18,6 +18,8 @@ const validMediaObj = {
 
 describe( 'mediaUpload', () => {
 	const onFileChangeSpy = jest.fn();
+	const createObjectURL = jest.fn();
+	window.URL.createObjectURL = createObjectURL;
 
 	it( 'should do nothing on no files', () => {
 		mediaUpload( { filesList: [], onFileChange: onFileChangeSpy, allowedType: 'image' } );
@@ -35,6 +37,59 @@ describe( 'mediaUpload', () => {
 		expect( onFileChangeSpy ).not.toHaveBeenCalled();
 		expect( onError ).toHaveBeenCalled();
 		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_SUPPORTED' );
+	} );
+
+	it( 'should correctly validate an allowedType containing a multiple type string', () => {
+		// When the upload has success we get errors because we don't have available on the test environment
+		// all the functions required by mediaUpload.
+		// We know that when a validation success the function tries to creat a temporary url for the file
+		// so we use that function to test the validation success.
+
+		const onError = jest.fn();
+		const testFile = {
+			url: 'https://cldup.com/uuUqE_dXzy.mp3',
+			type: 'audio/mp3',
+			name: 'mymusic.mp3',
+		};
+		expect( () => {
+			mediaUpload( {
+				filesList: [ testFile ],
+				onFileChange: onFileChangeSpy,
+				allowedType: 'video,image',
+				onError,
+			} );
+		} ).not.toThrow();
+		expect( createObjectURL ).not.toHaveBeenCalled();
+		expect( onError ).toHaveBeenCalled();
+		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_SUPPORTED' );
+
+		createObjectURL.mockReset();
+		onError.mockReset();
+
+		expect( () => {
+			mediaUpload( {
+				filesList: [ testFile ],
+				onFileChange: onFileChangeSpy,
+				allowedType: 'audio,image',
+				onError,
+			} );
+		} ).toThrow();
+		expect( createObjectURL ).toHaveBeenCalled();
+		expect( onError ).not.toHaveBeenCalled();
+
+		createObjectURL.mockReset();
+		onError.mockReset();
+
+		expect( () => {
+			mediaUpload( {
+				filesList: [ testFile ],
+				onFileChange: onFileChangeSpy,
+				allowedType: 'image,audio',
+				onError,
+			} );
+		} ).toThrow();
+		expect( createObjectURL ).toHaveBeenCalled();
+		expect( onError ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should call error handler with the correct error object if file size is greater than the maximum', () => {
