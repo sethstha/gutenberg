@@ -3,6 +3,7 @@
  */
 
 import { concat } from '../concat';
+import { getSparseArrayLength } from './helpers';
 
 describe( 'concat', () => {
 	const em = { type: 'em' };
@@ -25,5 +26,6 @@ describe( 'concat', () => {
 
 		expect( merged ).not.toBe( one );
 		expect( merged ).toEqual( three );
+		expect( getSparseArrayLength( merged.formats ) ).toBe( 2 );
 	} );
 } );

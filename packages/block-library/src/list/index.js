@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, omit, flatMap } from 'lodash';
+import { find, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ import {
 	BlockControls,
 	RichText,
 } from '@wordpress/editor';
-import { split } from '@wordpress/rich-text-structure';
+import { replace, join, split } from '@wordpress/rich-text-structure';
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -74,20 +74,14 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
 					return createBlock( 'core/list', {
-						values: flatMap( blockAttributes, ( { content } ) => {
-							return split( content, '\n' );
-						} ),
+						values: join( blockAttributes.map( ( { content } ) => replace( content, /\n/g, '\n\n' ) ), '\n\n' ),
 					} );
 				},
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/quote' ],
-				transform: ( { value, citation } ) => {
-					if ( ! RichText.isEmpty( citation ) ) {
-						value.push( citation );
-					}
-
+				transform: ( { value } ) => {
 					return createBlock( 'core/list', {
 						values: value,
 					} );
@@ -115,7 +109,7 @@ export const settings = {
 				regExp: /^[*-]\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						values: [ content ],
+						values: content,
 					} );
 				},
 			},
@@ -125,7 +119,7 @@ export const settings = {
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
 						ordered: true,
-						values: [ content ],
+						values: content,
 					} );
 				},
 			},
@@ -135,7 +129,9 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) =>
-					values.map( ( content ) => createBlock( 'core/paragraph', { content } ) ),
+					split( values, '\n\n' ).map( ( content ) =>
+						createBlock( 'core/paragraph', { content } )
+					),
 			},
 			{
 				type: 'block',

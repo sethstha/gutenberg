@@ -14,6 +14,7 @@ import {
 	AlignmentToolbar,
 	RichText,
 } from '@wordpress/editor';
+import { join, split } from '@wordpress/rich-text-structure';
 
 const blockAttributes = {
 	value: {
@@ -54,7 +55,7 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) => {
 					return createBlock( 'core/quote', {
-						value: attributes.map( ( { content } ) => content ),
+						value: join( attributes.map( ( { content } ) => content ), '\n\n' ),
 					} );
 				},
 			},
@@ -63,7 +64,7 @@ export const settings = {
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: [ content ],
+						value: content,
 					} );
 				},
 			},
@@ -72,7 +73,7 @@ export const settings = {
 				regExp: /^>\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: [ content ],
+						value: content,
 					} );
 				},
 			},
@@ -94,13 +95,10 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
-				transform: ( { value, citation } ) => {
-					if ( ! RichText.isEmpty( citation ) ) {
-						value.push( citation );
-					}
-
-					return value.map( ( content ) => createBlock( 'core/paragraph', { content } ) );
-				},
+				transform: ( { value } ) =>
+					split( value, '\n\n' ).map( ( content ) =>
+						createBlock( 'core/paragraph', { content } )
+					),
 			},
 			{
 				type: 'block',
@@ -114,14 +112,16 @@ export const settings = {
 						} );
 					}
 
+					const values = split( value, '\n\n' );
+
 					return [
 						createBlock( 'core/heading', {
-							content: value[ 0 ],
+							content: values[ 0 ],
 						} ),
 						createBlock( 'core/quote', {
 							...attrs,
 							citation,
-							value: value.slice( 1 ),
+							value: join( values.slice( 1 ), '\n\n' ),
 						} ),
 					];
 				},
