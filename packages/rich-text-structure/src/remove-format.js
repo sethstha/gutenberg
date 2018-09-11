@@ -14,34 +14,6 @@ export function removeFormat(
 		return removeFormatFromValue( ...arguments );
 	}
 
-	if ( Array.isArray( value ) ) {
-		return {
-			selection,
-			value: value.map( ( item, index ) => {
-				const [ startRecord, startOffset ] = start;
-				const [ endRecord, endOffset ] = end;
-
-				if ( startRecord === endRecord && startRecord === index ) {
-					return removeFormatFromValue( item, formatType, startOffset, endOffset );
-				}
-
-				if ( startRecord === index ) {
-					return removeFormatFromValue( item, formatType, startOffset, item.text.length );
-				}
-
-				if ( endRecord === index ) {
-					return removeFormatFromValue( item, formatType, 0, endOffset );
-				}
-
-				if ( index > startRecord && index < endRecord ) {
-					return removeFormatFromValue( item, formatType, 0, item.text.length );
-				}
-
-				return item;
-			} ),
-		};
-	}
-
 	return {
 		selection,
 		value: removeFormatFromValue( value, formatType, start, end ),

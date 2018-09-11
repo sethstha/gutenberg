@@ -9,7 +9,8 @@ import {
 	applyFormat,
 	removeFormat,
 	getActiveFormat,
-	getSelectedText,
+	getTextContent,
+	slice,
 } from '@wordpress/rich-text-structure';
 import { isURL } from '@wordpress/url';
 
@@ -48,7 +49,7 @@ class FormatToolbar extends Component {
 	}
 
 	addLink() {
-		const text = getSelectedText( this.props.record );
+		const text = getTextContent( slice( this.props.record ) );
 
 		if ( text && isURL( text ) ) {
 			this.applyFormat( {

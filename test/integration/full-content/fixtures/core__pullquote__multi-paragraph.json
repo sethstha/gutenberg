@@ -4,56 +4,51 @@
         "name": "core/pullquote",
         "isValid": true,
         "attributes": {
-            "value": [
-                {
-                    "formats": [
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        [
-                            {
-                                "type": "strong"
-                            }
-                        ],
-                        [
-                            {
-                                "type": "strong"
-                            }
-                        ],
-                        [
-                            {
-                                "type": "strong"
-                            }
-                        ]
+            "value": {
+                "formats": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    [
+                        {
+                            "type": "strong"
+                        }
                     ],
-                    "text": "Paragraph one"
-                },
-                {
-                    "formats": [
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null
+                    [
+                        {
+                            "type": "strong"
+                        }
                     ],
-                    "text": "Paragraph two"
-                }
-            ],
+                    [
+                        {
+                            "type": "strong"
+                        }
+                    ],
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                ],
+                "text": "Paragraph one\n\nParagraph two"
+            },
             "citation": {
                 "formats": [
                     null,

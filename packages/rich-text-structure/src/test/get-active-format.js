@@ -36,19 +36,4 @@ describe( 'getActiveFormat', () => {
 
 		expect( getActiveFormat( record, 'em' ) ).toBe( undefined );
 	} );
-
-	it( 'should get format by selection for multiline', () => {
-		const record = {
-			value: [ {
-				formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-				text: 'one two three',
-			} ],
-			selection: {
-				start: [ 0, 4 ],
-				end: [ 0, 4 ],
-			},
-		};
-
-		expect( getActiveFormat( record, 'em' ) ).toEqual( em );
-	} );
 } );

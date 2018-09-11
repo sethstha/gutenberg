@@ -8,16 +8,9 @@
 export function isCollapsed( { selection } ) {
 	const { start, end } = selection;
 
-	if ( ! start ) {
+	if ( start === undefined || end === undefined ) {
 		return;
 	}
 
-	if ( typeof start === 'number' ) {
-		return start === end;
-	}
-
-	const [ startRecord, startOffset ] = start;
-	const [ endRecord, endOffset ] = end;
-
-	return startRecord === endRecord && startOffset === endOffset;
+	return start === end;
 }

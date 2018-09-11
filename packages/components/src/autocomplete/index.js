@@ -13,10 +13,11 @@ import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } from '@wordpress/keycodes
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
-	create as createRichTextStructure,
-	getTextContent,
-	splice,
+	create,
+	slice,
+	insert,
 	isCollapsed,
+	getTextContent,
 } from '@wordpress/rich-text-structure';
 import { getRectangleFromRange } from '@wordpress/dom';
 
@@ -146,28 +147,6 @@ function getCaretRect() {
 	}
 }
 
-function getTextBeforeSelection( record ) {
-	const text = getTextContent( record );
-	let start = record.selection.start;
-
-	if ( Array.isArray( start ) ) {
-		start = start[ 1 ];
-	}
-
-	return text.slice( 0, start );
-}
-
-function getTextAfterSelection( record ) {
-	const text = getTextContent( record );
-	let start = record.selection.start;
-
-	if ( Array.isArray( start ) ) {
-		start = start[ 1 ];
-	}
-
-	return text.slice( start );
-}
-
 export class Autocomplete extends Component {
 	static getInitialState() {
 		return {
@@ -200,12 +179,11 @@ export class Autocomplete extends Component {
 	insertCompletion( replacement ) {
 		const { open, query } = this.state;
 		const { record, onChange } = this.props;
+		const end = record.selection.start;
+		const start = end - open.triggerPrefix.length - query.length;
+		const toInsert = create( renderToString( replacement ) );
 
-		const deleteCount = open.triggerPrefix.length + query.length;
-		const replacementStart = record.selection.start - deleteCount;
-		const replacementHTML = renderToString( replacement );
-		const replacementRecord = createRichTextStructure( replacementHTML );
-		onChange( splice( record, replacementStart, deleteCount, replacementRecord.value.text, replacementRecord.value.formats ) );
+		onChange( insert( record, toInsert, start, end ) );
 	}
 
 	select( option ) {
@@ -405,11 +383,11 @@ export class Autocomplete extends Component {
 		}
 
 		if ( isCollapsed( record ) ) {
-			const text = getTextBeforeSelection( record );
-			const prevText = getTextBeforeSelection( prevRecord );
+			const text = getTextContent( slice( record, 0 ) );
+			const prevText = getTextContent( slice( prevRecord, 0 ) );
 
 			if ( text !== prevText ) {
-				const textAfterSelection = getTextAfterSelection( record );
+				const textAfterSelection = getTextContent( slice( record, undefined, getTextContent( record ).length ) );
 				const allCompleters = map( completers, ( completer, idx ) => ( { ...completer, idx } ) );
 				const open = find( allCompleters, ( { triggerPrefix, allowContext } ) => {
 					const index = text.lastIndexOf( triggerPrefix );

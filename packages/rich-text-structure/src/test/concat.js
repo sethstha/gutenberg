@@ -26,20 +26,4 @@ describe( 'concat', () => {
 		expect( merged ).not.toBe( one );
 		expect( merged ).toEqual( three );
 	} );
-
-	it( 'should merge multiline records', () => {
-		const one = [ {
-			formats: [ , , [ em ] ],
-			text: 'one',
-		} ];
-		const two = [ {
-			formats: [ , , [ em ] ],
-			text: 'two',
-		} ];
-
-		const merged = concat( one, two );
-
-		expect( merged ).not.toBe( one );
-		expect( merged ).toEqual( [ ...one, ...two ] );
-	} );
 } );

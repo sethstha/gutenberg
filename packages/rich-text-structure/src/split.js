@@ -1,13 +1,44 @@
-export function split( record, string ) {
+export function split( { selection, value }, string ) {
 	if ( typeof string !== 'string' ) {
-		if ( record.value !== undefined ) {
-			return splitRecordAtSelection( ...arguments );
+		if ( value === undefined ) {
+			return splitValueAtSelection( ...arguments );
 		}
 
-		return splitValueAtSelection( ...arguments );
+		return splitRecordAtSelection( ...arguments );
 	}
 
-	const { text, formats } = record;
+	if ( value === undefined ) {
+		return splitValue( ...arguments );
+	}
+
+	let nextStart = 0;
+
+	return splitValue( value, string ).map( ( piece ) => {
+		const splitSelection = {};
+		const start = nextStart;
+
+		nextStart += piece.text.length + string.length;
+
+		if ( selection.start > start && selection.start < nextStart ) {
+			splitSelection.start = selection.start - start;
+		} else if ( selection.start < start && selection.end > start ) {
+			splitSelection.start = 0;
+		}
+
+		if ( selection.end > start && selection.end < nextStart ) {
+			splitSelection.end = selection.end - start;
+		} else if ( selection.start < nextStart && selection.end > nextStart ) {
+			splitSelection.end = piece.text.length;
+		}
+
+		return {
+			selection: splitSelection,
+			value: piece,
+		};
+	} );
+}
+
+function splitValue( { text, formats }, string ) {
 	let nextStart = 0;
 
 	return text.split( string ).map( ( substring ) => {

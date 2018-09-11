@@ -356,19 +356,12 @@ describe( 'create', () => {
 			} ),
 			record: {
 				selection: {
-					start: [ 0, 1 ],
-					end: [ 1 ],
+					start: 1,
 				},
-				value: [
-					{
-						formats: [ , , , ],
-						text: 'one',
-					},
-					{
-						formats: [ , , , ],
-						text: 'two',
-					},
-				],
+				value: {
+					formats: [ , , , , , , , , ],
+					text: 'one\n\ntwo',
+				},
 			},
 		},
 		{
@@ -382,17 +375,14 @@ describe( 'create', () => {
 				endContainer: element,
 			} ),
 			record: {
-				selection: {},
-				value: [
-					{
-						formats: [ , , , list, list, list ],
-						text: 'onetwo',
-					},
-					{
-						formats: [ , , , , , ],
-						text: 'three',
-					},
-				],
+				selection: {
+					start: 0,
+					end: 6,
+				},
+				value: {
+					formats: [ , , , list, list, list, , , , , , , , ],
+					text: 'onetwo\n\nthree',
+				},
 			},
 		},
 		{

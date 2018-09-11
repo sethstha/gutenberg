@@ -45,7 +45,10 @@ export function create( element, range, multilineTag, settings ) {
 	}
 
 	const emptyRecord = {
-		value: [],
+		value: {
+			formats: [],
+			text: '',
+		},
 		selection: {},
 	};
 
@@ -53,28 +56,47 @@ export function create( element, range, multilineTag, settings ) {
 		return emptyRecord;
 	}
 
-	return Array.from( element.childNodes ).reduce( ( accumlator, child, index ) => {
-		if ( child.nodeName.toLowerCase() === multilineTag ) {
-			const { selection, value } = createRecord( child, range, settings );
+	const children = Array.from( element.children )
+		.filter( ( { nodeName } ) => nodeName.toLowerCase() === multilineTag );
+	const maxIndex = children.length - 1;
 
-			if ( range ) {
-				if ( selection.start !== undefined ) {
-					accumlator.selection.start = [ index ].concat( selection.start );
-				} else if ( child === range.startContainer ) {
-					accumlator.selection.start = [ index ];
-				}
+	if ( maxIndex < 0 ) {
+		return emptyRecord;
+	}
 
-				if ( selection.end !== undefined ) {
-					accumlator.selection.end = [ index ].concat( selection.end );
-				} else if ( child === range.endContainer ) {
-					accumlator.selection.end = [ index ];
-				}
+	return children.reduce( ( accumulator, node, index ) => {
+		const { selection, value } = createRecord( node, range, settings );
+		const length = accumulator.value.text.length;
+
+		if ( range ) {
+			if ( selection.start !== undefined ) {
+				accumulator.selection.start = length + selection.start;
+			} else if (
+				node.parentNode === range.startContainer &&
+				node === range.startContainer.childNodes[ range.startOffset ]
+			) {
+				accumulator.selection.start = length;
 			}
 
-			accumlator.value.push( value );
+			if ( selection.end !== undefined ) {
+				accumulator.selection.end = length + selection.end;
+			} else if (
+				node.parentNode === range.endContainer &&
+				node === range.endContainer.childNodes[ range.endOffset - 1 ]
+			) {
+				accumulator.selection.end = length + value.text.length;
+			}
 		}
 
-		return accumlator;
+		accumulator.value.formats = accumulator.value.formats.concat( value.formats );
+		accumulator.value.text += value.text;
+
+		if ( index !== maxIndex ) {
+			accumulator.value.formats = accumulator.value.formats.concat( [ , , ] );
+			accumulator.value.text += '\n\n';
+		}
+
+		return accumulator;
 	}, emptyRecord );
 }
 

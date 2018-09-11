@@ -14,8 +14,10 @@ import {
 import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
 import {
-	splice,
+	create,
+	insert,
 	isCollapsed,
+	applyFormat,
 } from '@wordpress/rich-text-structure';
 
 /**
@@ -126,7 +128,8 @@ class LinkContainer extends Component {
 		}
 
 		if ( isCollapsed( record ) ) {
-			this.props.onChange( splice( record, undefined, undefined, href, format ) );
+			const toInsert = applyFormat( create( href ), format, 0, href.length );
+			this.props.onChange( insert( record, toInsert ) );
 		} else {
 			this.props.applyFormat( format );
 		}

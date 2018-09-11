@@ -1,3 +1,6 @@
+
+import { split } from './split';
+
 /**
  * Browser dependencies
  */
@@ -126,19 +129,14 @@ export function recordToDom( { value, selection = {} }, tag ) {
 	};
 }
 
-export function multilineRecordToDom( { value, selection }, tag ) {
+export function multilineRecordToDom( record, tag ) {
 	const htmlDocument = document.implementation.createHTMLDocument( '' );
 	const { body } = htmlDocument;
 	let startPath = [];
 	let endPath = [];
 
-	value.forEach( ( piece, index ) => {
-		const start = selection.start && selection.start[ 0 ] === index ? selection.start[ 1 ] : undefined;
-		const end = selection.end && selection.end[ 0 ] === index ? selection.end[ 1 ] : undefined;
-		const dom = recordToDom( {
-			value: piece,
-			selection: { start, end },
-		}, tag );
+	split( record, '\n\n' ).forEach( ( piece, index ) => {
+		const dom = recordToDom( piece, tag );
 
 		body.appendChild( dom.body );
 

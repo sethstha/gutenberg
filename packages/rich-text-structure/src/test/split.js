@@ -9,18 +9,33 @@ describe( 'split', () => {
 
 	it( 'should split', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
+			selection: {
+				start: 5,
+				end: 10,
+			},
+			value: {
+				formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+				text: 'one two three',
+			},
 		};
 
 		const expected = [
 			{
-				formats: [ , , , , [ em ], [ em ] ],
-				text: 'one tw',
+				selection: {},
+				value: {
+					formats: [ , , , , [ em ], [ em ] ],
+					text: 'one tw',
+				},
 			},
 			{
-				formats: [ [ em ], , , , , , , ],
-				text: 'o three',
+				selection: {
+					start: 0,
+					end: 0,
+				},
+				value: {
+					formats: [ [ em ], , , , , , , ],
+					text: 'o three',
+				},
 			},
 		];
 
@@ -78,22 +93,102 @@ describe( 'split', () => {
 
 	it( 'should split search', () => {
 		const record = {
-			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
-			text: 'one two three',
+			selection: {
+				start: 6,
+				end: 16,
+			},
+			value: {
+				formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , , , , , , , , , , , ],
+				text: 'one two three four five',
+			},
 		};
 
 		const expected = [
 			{
-				formats: [ , , , ],
-				text: 'one',
+				selection: {},
+				value: {
+					formats: [ , , , ],
+					text: 'one',
+				},
 			},
 			{
-				formats: [ [ em ], [ em ], [ em ] ],
-				text: 'two',
+				selection: {
+					start: 2,
+					end: 3,
+				},
+				value: {
+					formats: [ [ em ], [ em ], [ em ] ],
+					text: 'two',
+				},
 			},
 			{
-				formats: [ , , , , , ],
-				text: 'three',
+				selection: {
+					start: 0,
+					end: 5,
+				},
+				value: {
+					formats: [ , , , , , ],
+					text: 'three',
+				},
+			},
+			{
+				selection: {
+					start: 0,
+					end: 2,
+				},
+				value: {
+					formats: [ , , , , ],
+					text: 'four',
+				},
+			},
+			{
+				selection: {},
+				value: {
+					formats: [ , , , , ],
+					text: 'five',
+				},
+			},
+		];
+
+		expect( split( record, ' ' ) ).toEqual( expected );
+	} );
+
+	it( 'should split search 2', () => {
+		const record = {
+			selection: {
+				start: 5,
+				end: 6,
+			},
+			value: {
+				formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+				text: 'one two three',
+			},
+		};
+
+		const expected = [
+			{
+				selection: {},
+				value: {
+					formats: [ , , , ],
+					text: 'one',
+				},
+			},
+			{
+				selection: {
+					start: 1,
+					end: 2,
+				},
+				value: {
+					formats: [ [ em ], [ em ], [ em ] ],
+					text: 'two',
+				},
+			},
+			{
+				selection: {},
+				value: {
+					formats: [ , , , , , ],
+					text: 'three',
+				},
 			},
 		];
 

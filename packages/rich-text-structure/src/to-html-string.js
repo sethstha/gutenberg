@@ -1,3 +1,5 @@
+import { split } from './split';
+
 /**
  * Creates an HTML string from a rich text record.
  *
@@ -57,10 +59,10 @@ function createChildrenHTML( children = [] ) {
 	} ).join( '' );
 }
 
-export function valueToString( value, multiline ) {
-	if ( multiline ) {
-		return value.map( ( line ) =>
-			`<${ multiline }>${ valueToString( line ) }</${ multiline }>`
+export function valueToString( value, multilineTag ) {
+	if ( multilineTag ) {
+		return split( value, '\n\n' ).map( ( line ) =>
+			`<${ multilineTag }>${ valueToString( line ) }</${ multilineTag }>`
 		).join( '' );
 	}
 

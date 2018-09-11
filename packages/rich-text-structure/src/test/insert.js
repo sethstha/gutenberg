@@ -2,9 +2,9 @@
  * Internal dependencies
  */
 
-import { splice } from '../splice';
+import { insert } from '../insert';
 
-describe( 'splice', () => {
+describe( 'insert', () => {
 	const em = { type: 'em' };
 	const strong = { type: 'strong' };
 
@@ -20,6 +20,14 @@ describe( 'splice', () => {
 			},
 		};
 
+		const toInsert = {
+			value: {
+				formats: [ [ strong ] ],
+				text: 'a',
+			},
+			selection: {},
+		};
+
 		const expected = {
 			value: {
 				formats: [ , , [ strong ], [ em ], , , , , , , ],
@@ -31,7 +39,7 @@ describe( 'splice', () => {
 			},
 		};
 
-		expect( splice( record, 2, 4, 'a', [ [ strong ] ] ) ).toEqual( expected );
+		expect( insert( record, toInsert, 2, 6 ) ).toEqual( expected );
 	} );
 
 	it( 'should insert line break with selection', () => {
@@ -46,6 +54,14 @@ describe( 'splice', () => {
 			},
 		};
 
+		const toInsert = {
+			value: {
+				formats: [ , ],
+				text: '\n',
+			},
+			selection: {},
+		};
+
 		const expected = {
 			value: {
 				formats: [ , , , ],
@@ -57,6 +73,6 @@ describe( 'splice', () => {
 			},
 		};
 
-		expect( splice( record, undefined, 0, '\n' ) ).toEqual( expected );
+		expect( insert( record, toInsert ) ).toEqual( expected );
 	} );
 } );

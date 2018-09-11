@@ -157,7 +157,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 
 	if ( attributeSchema.source === 'children' ) {
 		attributeSchema.default = createValue( null, attributeSchema.multiline );
-		attributeSchema.type = attributeSchema.multiline ? 'array' : 'object';
+		attributeSchema.type = 'object';
 	}
 
 	switch ( attributeSchema.source ) {
