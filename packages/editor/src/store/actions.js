@@ -763,3 +763,79 @@ export function unregisterToken( name ) {
 		name,
 	};
 }
+
+// console shortcut: wp.data.dispatch( "core/editor" ).addAnnotation( { block: wp.data.select( "core/editor" ).getBlockOrder()[0], startXPath: "text()[1]", startOffset: 50, endXPath: "text()[1]", endOffset: 100 } );
+
+// Known limitations:
+// * Annotations cannot overlap.
+
+/**
+ * Adds an annotation to a piece of text in a block.
+ *
+ * @param {Object} annotation         The annotation to add.
+ * @param {string} block              The block to add the annotation to.
+ * @param {string} startXPath         The XPath where the annotation should start.
+ * @param {number} startOffset        The offset where the annotation should start.
+ * @param {string} endXPath           The XPath where the annotation should end.
+ * @param {number} endOffset          The offset where the annotation should end.
+ * @param {string} [source="default"] The source that added the annotation.
+ * @param {string} [id=uuid()]        The ID the annotation should have. Generates a UUID by default.
+ *
+ * @return {Object} Action object.
+ */
+export function addAnnotation( { block, startXPath, startOffset, endXPath, endOffset, source = 'default', id = uuid() } ) {
+	return {
+		type: 'ANNOTATION_ADD',
+		id,
+		block,
+		source,
+		startXPath,
+		startOffset,
+		endXPath,
+		endOffset,
+	};
+}
+
+/**
+ * Removes an annotation with a specific ID.
+ *
+ * @param {string} annotationId The annotation to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeAnnotation( annotationId ) {
+	return {
+		type: 'ANNOTATION_REMOVE',
+		annotationId,
+	};
+}
+
+/**
+ * Removes all annotations of a specific source.
+ *
+ * @param {string} source The source to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeAnnotationsBySource( source ) {
+	return {
+		type: 'ANNOTATION_REMOVE_SOURCE',
+		source,
+	};
+}
+
+/**
+ * Moves an annotation to a different XPath.
+ *
+ * @param {string} annotationId The annotation to change.
+ * @param {Object} xpath        The new location for the annotation.
+ *
+ * @return {Object} Action object.
+ */
+export function moveAnnotation( annotationId, xpath ) {
+	return {
+		type: 'ANNOTATION_MOVE',
+		annotationId,
+		xpath,
+	};
+}

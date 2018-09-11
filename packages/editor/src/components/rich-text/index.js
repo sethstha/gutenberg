@@ -7,6 +7,7 @@ import {
 	find,
 	identity,
 	noop,
+	cloneDeep,
 } from 'lodash';
 import 'element-closest';
 import memize from 'memize';
@@ -39,6 +40,8 @@ import {
 	createValue,
 	isSelectionEqual,
 	getTextContent,
+	matchXPath,
+	removeFormat,
 } from '@wordpress/rich-text-structure';
 
 /**
@@ -436,13 +439,16 @@ export class RichText extends Component {
 	 *                                the live DOM.
 	 */
 	onChange( record, _withoutApply ) {
+		// Filter out annotations
+		const filteredRecord = removeFormat( record, 'mark', 0, record.value.text.length );
+
 		if ( ! _withoutApply ) {
-			this.applyRecord( record );
+			this.applyRecord( filteredRecord );
 		}
 
-		this.savedContent = this.valueToFormat( record.value );
+		this.savedContent = this.valueToFormat( filteredRecord.value );
 		this.props.onChange( this.savedContent );
-		this.setState( { selection: record.selection } );
+		this.setState( { selection: filteredRecord.selection } );
 	}
 
 	onCreateUndoLevel( event ) {
@@ -783,18 +789,59 @@ export class RichText extends Component {
 		}
 	}
 
+	applyAnnotations( value, annotations ) {
+		let annotationApplied = { value: cloneDeep( value ) };
+
+		annotations.forEach( ( annotation ) => {
+			let startPos = matchXPath( value, annotation.startXPath );
+			let endPos = matchXPath( value, annotation.endXPath );
+
+			if ( startPos !== false ) {
+				startPos += annotation.startOffset;
+			}
+
+			if ( endPos !== false ) {
+				endPos += annotation.endOffset;
+			}
+
+			if (
+				startPos !== false &&
+				endPos !== false &&
+				startPos <= endPos &&
+				startPos <= value.text.length &&
+				endPos <= value.text.length
+			) {
+				annotationApplied = applyFormat(
+					annotationApplied,
+					{ type: 'mark' },
+					startPos,
+					endPos
+				);
+			}
+		} );
+
+		return annotationApplied.value;
+	}
+
 	componentDidUpdate( prevProps ) {
-		const { tagName, value } = this.props;
+		const { tagName, value, annotations } = this.props;
 		const { selection } = this.state;
+
+		const applyAnnotations = annotations !== prevProps.annotations;
 
 		if (
 			this.editor &&
-			tagName === prevProps.tagName &&
-			value !== prevProps.value &&
-			value !== this.savedContent
+			(
+				(
+					tagName === prevProps.tagName &&
+					value !== prevProps.value &&
+					value !== this.savedContent
+				) ||
+				applyAnnotations
+			)
 		) {
 			this.applyRecord( {
-				value: this.formatToValue( value ),
+				value: this.formatToValue( this.applyAnnotations( value, annotations ) ),
 				selection: this.editor.hasFocus() ? selection : undefined,
 			} );
 		}
@@ -936,6 +983,7 @@ const RichTextContainer = compose( [
 		if ( ownProps.isSelected === true ) {
 			return {
 				isSelected: context.isSelected,
+				clientId: context.clientId,
 			};
 		}
 
@@ -943,15 +991,17 @@ const RichTextContainer = compose( [
 		return {
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
 			setFocusedElement: context.setFocusedElement,
+			clientId: context.clientId,
 		};
 	} ),
-	withSelect( ( select ) => {
+	withSelect( ( select, props ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
 		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
+			annotations: select( 'core/editor' ).getAnnotationsForBlock( props.clientId ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

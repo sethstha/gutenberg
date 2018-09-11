@@ -15,3 +15,4 @@ export { slice } from './slice';
 export { split } from './split';
 export { apply } from './to-dom';
 export { toHTMLString } from './to-html-string';
+export { matchXPath } from './xpath';

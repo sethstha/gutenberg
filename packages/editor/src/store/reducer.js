@@ -17,6 +17,7 @@ import {
 	isEqual,
 	overSome,
 	get,
+	find,
 } from 'lodash';
 
 /**
@@ -1079,6 +1080,66 @@ export function tokens( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing annotations.
+ *
+ * @param {Array} state The annotations currently shown in the editor.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Array} Updated state.
+ */
+export function annotations( state = [], action ) {
+	switch ( action.type ) {
+		case 'ANNOTATION_ADD':
+			return [
+				{
+					id: action.id,
+					block: action.block,
+					source: action.source,
+					startXPath: action.startXPath,
+					startOffset: action.startOffset,
+					endXPath: action.endXPath,
+					endOffset: action.endOffset,
+				},
+				...state,
+			];
+
+		case 'ANNOTATION_REMOVE':
+			return state.filter( ( annotation ) => {
+				return annotation.id !== action.annotationId;
+			} );
+
+		case 'ANNOTATION_MOVE':
+			const annotationToMove = find( state, [ 'id', action.annotationId ] );
+			const xpath = action.xpath;
+
+			// Cannot move an annotation that isn't present.
+			if ( ! annotationToMove ) {
+				return state;
+			}
+
+			return [
+				...state.filter( ( annotation ) => {
+					return annotation.id !== action.annotationId;
+				} ),
+				{
+					...annotationToMove,
+					startXPath: xpath.start,
+					startOffset: xpath.startOffset,
+					endXPath: xpath.end,
+					endOffset: xpath.endOffset,
+				},
+			];
+
+		case 'ANNOTATION_REMOVE_SOURCE':
+			return state.filter( ( annotation ) => {
+				return annotation.source !== action.source;
+			} );
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -1095,4 +1156,5 @@ export default optimist( combineReducers( {
 	autosave,
 	settings,
 	tokens,
+	annotations,
 } ) );

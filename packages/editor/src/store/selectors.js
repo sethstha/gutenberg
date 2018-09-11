@@ -1882,3 +1882,22 @@ export function getTokenSettings( state, name ) {
 export function canUserUseUnfilteredHTML( state ) {
 	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
 }
+
+/**
+ * Returns the annotations for a specific client ID.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} clientId The ID of the block to get the annotations for.
+ *
+ * @return {Array} The annotations applicable to this block.
+ */
+export const getAnnotationsForBlock = createSelector(
+	( state, clientId ) => {
+		return state.annotations.filter( ( annotation ) => {
+			return annotation.block === clientId;
+		} );
+	},
+	( state ) => [
+		state.annotations,
+	]
+);
