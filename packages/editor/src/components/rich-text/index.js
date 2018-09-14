@@ -7,6 +7,7 @@ import {
 	find,
 	identity,
 	noop,
+	isEqual,
 } from 'lodash';
 import memize from 'memize';
 
@@ -771,6 +772,15 @@ export class RichText extends Component {
 			value !== prevProps.value &&
 			value !== this.savedContent
 		) {
+			// The old way of passing a value with the `node` matcher required
+			// the value to be mapped first, creating a new array each time, so
+			// a shallow check wouldn't work. We need to check deep equality.
+			// This is only executed for a deprecated API and will eventually be
+			// removed.
+			if ( Array.isArray( value ) && isEqual( value, this.savedContent ) ) {
+				return;
+			}
+
 			const record = this.formatToValue( value );
 			const { start, end } = this.state;
 
