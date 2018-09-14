@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -11,23 +6,13 @@ import {
 	RichText,
 } from '@wordpress/editor';
 
-const toRichTextValue = ( value ) => map( value, ( ( subValue ) => subValue.children ) );
-const fromRichTextValue = ( value ) => map( value, ( subValue ) => ( {
-	children: subValue,
-} ) );
 const blockAttributes = {
 	value: {
-		type: 'array',
-		source: 'query',
-		selector: 'blockquote > p',
-		query: {
-			children: {
-				source: 'node',
-			},
-		},
+		source: 'children',
+		selector: 'blockquote',
+		multiline: 'p',
 	},
 	citation: {
-		type: 'array',
 		source: 'children',
 		selector: 'cite',
 	},
@@ -59,10 +44,10 @@ export const settings = {
 				<blockquote>
 					<RichText
 						multiline="p"
-						value={ toRichTextValue( value ) }
+						value={ value }
 						onChange={
 							( nextValue ) => setAttributes( {
-								value: fromRichTextValue( nextValue ),
+								value: nextValue,
 							} )
 						}
 						/* translators: the text of the quotation */
@@ -93,7 +78,7 @@ export const settings = {
 		return (
 			<figure>
 				<blockquote>
-					<RichText.Content value={ toRichTextValue( value ) } />
+					<RichText.Content value={ value } multiline="p" />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>
 			</figure>
@@ -108,7 +93,7 @@ export const settings = {
 			const { value, citation } = attributes;
 			return (
 				<blockquote>
-					<RichText.Content value={ toRichTextValue( value ) } />
+					<RichText.Content value={ value } multiline="p" />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>
 			);
@@ -117,7 +102,6 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			citation: {
-				type: 'array',
 				source: 'children',
 				selector: 'footer',
 			},
@@ -132,7 +116,7 @@ export const settings = {
 
 			return (
 				<blockquote className={ `align${ align }` }>
-					<RichText.Content value={ toRichTextValue( value ) } />
+					<RichText.Content value={ value } />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>
 			);

@@ -25,7 +25,6 @@ const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 const blockAttributes = {
 	title: {
-		type: 'array',
 		source: 'children',
 		selector: 'p',
 	},
@@ -274,7 +273,6 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			title: {
-				type: 'array',
 				source: 'children',
 				selector: 'h2',
 			},
