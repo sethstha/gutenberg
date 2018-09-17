@@ -38,6 +38,7 @@ import {
 	createValue,
 	getTextContent,
 	join,
+	insert,
 } from '@wordpress/rich-text-structure';
 import deprecated from '@wordpress/deprecated';
 
@@ -102,6 +103,8 @@ export class RichText extends Component {
 		this.applyRecord = this.applyRecord.bind( this );
 		this.isEmpty = this.isEmpty.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
+		this.setRef = this.setRef.bind( this );
+		this.isActive = this.isActive.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
@@ -123,6 +126,14 @@ export class RichText extends Component {
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+	}
+
+	setRef( node ) {
+		this.editableRef = node;
+	}
+
+	isActive() {
+		return this.editableRef === document.activeElement;
 	}
 
 	/**
@@ -225,17 +236,15 @@ export class RichText extends Component {
 
 	createRecord() {
 		const { multiline } = this.props;
-		const rootNode = this.editor.getBody();
-		const range = this.editor.selection.getRng();
+		const range = window.getSelection().getRangeAt( 0 );
 
-		return create( rootNode, range, multiline, richTextStructureSettings );
+		return create( this.editableRef, range, multiline, richTextStructureSettings );
 	}
 
 	applyRecord( record ) {
 		const { multiline } = this.props;
-		const rootNode = this.editor.getBody();
 
-		apply( record, rootNode, multiline );
+		apply( record, this.editableRef, multiline );
 	}
 
 	isEmpty() {
@@ -344,7 +353,7 @@ export class RichText extends Component {
 		} );
 
 		if ( typeof content === 'string' ) {
-			this.editor.insertContent( content );
+			this.onChange( insert( this.getRecord(), content ) );
 		} else if ( this.props.onSplit ) {
 			if ( ! content.length ) {
 				return;
@@ -400,7 +409,7 @@ export class RichText extends Component {
 	 */
 	onSelectionChange() {
 		// Ensure it's the active element. This is a global event.
-		if ( document.activeElement !== this.editor.getBody() ) {
+		if ( ! this.isActive() ) {
 			return;
 		}
 
@@ -490,7 +499,7 @@ export class RichText extends Component {
 		// will include a bogus TinyMCE BR node _after_ the caret, so in a
 		// forward deletion the isHorizontalEdge function will incorrectly
 		// interpret the presence of the bogus node as not being at the edge.
-		const isEdge = ( empty || isHorizontalEdge( this.editor.getBody(), isReverse ) );
+		const isEdge = ( empty || isHorizontalEdge( this.editableRef, isReverse ) );
 
 		if ( ! isEdge ) {
 			return;
@@ -567,7 +576,6 @@ export class RichText extends Component {
 	 */
 	onKeyDown( event ) {
 		const dom = this.editor.dom;
-		const rootNode = this.editor.getBody();
 		const { keyCode } = event;
 
 		const isDelete = keyCode === DELETE || keyCode === BACKSPACE;
@@ -609,7 +617,7 @@ export class RichText extends Component {
 
 				const selectedNode = this.editor.selection.getNode();
 
-				if ( selectedNode.parentNode !== rootNode ) {
+				if ( selectedNode.parentNode !== this.editableRef ) {
 					return;
 				}
 
@@ -619,7 +627,7 @@ export class RichText extends Component {
 
 				event.preventDefault();
 
-				const childNodes = Array.from( rootNode.childNodes );
+				const childNodes = Array.from( this.editableRef.childNodes );
 				const index = dom.nodeIndex( selectedNode );
 				const beforeNodes = childNodes.slice( 0, index );
 				const afterNodes = childNodes.slice( index + 1 );
@@ -673,7 +681,7 @@ export class RichText extends Component {
 
 	scrollToRect( rect ) {
 		const { top: caretTop } = rect;
-		const container = getScrollContainer( this.editor.getBody() );
+		const container = getScrollContainer( this.editableRef );
 
 		if ( ! container ) {
 			return;
@@ -747,7 +755,7 @@ export class RichText extends Component {
 	}
 
 	onNodeChange( { parents } ) {
-		if ( document.activeElement !== this.editor.getBody() ) {
+		if ( ! this.isActive() ) {
 			return;
 		}
 
@@ -773,7 +781,6 @@ export class RichText extends Component {
 		const { tagName, value } = this.props;
 
 		if (
-			this.editor &&
 			tagName === prevProps.tagName &&
 			value !== prevProps.value &&
 			value !== this.savedContent
@@ -790,7 +797,7 @@ export class RichText extends Component {
 			const record = this.formatToValue( value );
 			const { start, end } = this.state;
 
-			if ( this.editor.hasFocus() ) {
+			if ( this.isActive() ) {
 				record.start = start;
 				record.end = end;
 			}
@@ -923,6 +930,7 @@ export class RichText extends Component {
 								onPaste={ this.onPaste }
 								onInput={ this.onInput }
 								multilineTag={ MultilineTag }
+								setRef={ this.setRef }
 							/>
 							{ isPlaceholderVisible &&
 								<Tagname
